@@ -10,9 +10,15 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Get the absolute paths to frontend directories
+current_dir = os.path.dirname(os.path.abspath(__file__))
+frontend_dir = os.path.join(os.path.dirname(current_dir), 'frontend')
+template_dir = os.path.join(frontend_dir, 'templates')
+static_dir = os.path.join(frontend_dir, 'static')
+
 app = Flask(__name__, 
-            template_folder='../frontend/templates',
-            static_folder='../frontend/static')
+            template_folder=template_dir,
+            static_folder=static_dir)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///equilearn.db'
