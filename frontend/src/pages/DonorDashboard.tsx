@@ -69,7 +69,7 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
             <div>No schools found for your city.</div>
           )}
           <div className="schools-grid">
-            {featuredSchools.map((school, idx) => {
+            {Array.isArray(featuredSchools) && featuredSchools.map((school, idx) => {
               const percent = school.fundingGoal && school.currentFunding ? Math.round((school.currentFunding / school.fundingGoal) * 100) : 0;
               // Fix needs display
               let needsList: string[] = [];

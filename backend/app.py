@@ -6,14 +6,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+load_dotenv()
 import openai
-openai.api_key = os.getenv('OPENAI_API_KEY')
 import re
 import json
-from models import FeaturedSchool
-
-# Load environment variables
-load_dotenv()
+from models import User, School, Need, Donation, FeaturedSchool
+from extensions import db, login_manager
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Get the absolute paths to frontend directories
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,56 +28,11 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///equilearn.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize extensions
-db = SQLAlchemy(app)
+db.init_app(app)
 CORS(app)
-login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
 
 # Database Models
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
-    name = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(20), default='donor')  # donor, admin, school
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    donations = db.relationship('Donation', backref='donor', lazy=True)
-
-class School(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    location = db.Column(db.String(50), nullable=False)  # urban, rural, suburban
-    city = db.Column(db.String(100), nullable=False)
-    state = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.Text)
-    verified = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    needs = db.relationship('Need', backref='school', lazy=True)
-
-class Need(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.Integer, db.ForeignKey('school.id'), nullable=False)
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String(50), nullable=False)
-    urgency = db.Column(db.String(20), nullable=False)  # high, medium, low
-    total_needed = db.Column(db.Integer, nullable=False)
-    current_donations = db.Column(db.Integer, default=0)
-    cost_per_item = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    donations = db.relationship('Donation', backref='need', lazy=True)
-
-class Donation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    donor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    need_id = db.Column(db.Integer, db.ForeignKey('need.id'), nullable=True)
-    amount = db.Column(db.Float, nullable=False)
-    donation_type = db.Column(db.String(20), nullable=False)  # direct, pool
-    message = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -501,6 +455,15 @@ def init_db():
             db.session.commit()
         
         print("Database initialized successfully!")
+
+class OpenAIKeyLoader:
+    @staticmethod
+    def ensure_key():
+        import openai, os
+        if not openai.api_key or openai.api_key == '':
+            openai.api_key = "sk-...yourkey..."  # <-- REPLACE with your real key
+
+OpenAIKeyLoader.ensure_key()
 
 if __name__ == '__main__':
     init_db()

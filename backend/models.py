@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_login import UserMixin
-from .extensions import db
+from extensions import db
 from sqlalchemy.dialects.sqlite import JSON
 
 class User(UserMixin, db.Model):

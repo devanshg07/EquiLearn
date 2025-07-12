@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
-import Schools from './pages/Schools';
 import DonorDashboard from './pages/DonorDashboard';
 import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
@@ -38,7 +37,6 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/schools" element={<Schools />} />
             <Route 
               path="/dashboard" 
               element={

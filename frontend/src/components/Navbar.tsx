@@ -27,7 +27,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser, onLogout }) => {
         
         <div className="navbar-menu">
           <Link to="/" className="navbar-link">Home</Link>
-          <Link to="/schools" className="navbar-link">Schools</Link>
           
           {currentUser?.role === 'donor' && (
             <Link to="/dashboard" className="navbar-link">Dashboard</Link>
