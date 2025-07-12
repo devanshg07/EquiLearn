@@ -6,6 +6,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+import openai
+openai.api_key = os.getenv('OPENAI_API_KEY')
+import re
+import json
 
 # Load environment variables
 load_dotenv()
@@ -336,6 +340,28 @@ def get_impact_stats():
         'needs_funded': total_needs,
         'students_impacted': int(total_donations / 100)  # Rough estimate
     })
+
+@app.route('/api/featured-schools')
+def featured_schools():
+    city = request.args.get('city')
+    if not city:
+        return jsonify({'error': 'City is required'}), 400
+    prompt = f"List 3 real K-12 schools in {city}, with a short description and what they need donations for. Format as JSON: [{{'name':..., 'location':..., 'description':..., 'needs':...}}]"
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=300
+        )
+        # Try to extract JSON from the response
+        match = re.search(r'\[.*\]', response['choices'][0]['message']['content'], re.DOTALL)
+        if match:
+            schools = json.loads(match.group(0))
+        else:
+            schools = []
+        return jsonify(schools)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Authentication routes
 @app.route('/register/donor', methods=['GET', 'POST'])

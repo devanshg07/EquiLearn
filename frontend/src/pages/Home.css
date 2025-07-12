@@ -1,8 +1,10 @@
 /* Home Page Modern Styles */
-.home {
+body, .home {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f4f6fb 100%);
 }
 
 .hero {
@@ -13,6 +15,8 @@
   display: flex;
   align-items: center;
   min-height: 60vh;
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.10);
 }
 
 .hero-content {
@@ -27,10 +31,11 @@
 
 .hero h1 {
   font-size: 3.2rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 1.2rem;
   line-height: 1.1;
   letter-spacing: -1px;
+  text-shadow: 0 2px 12px rgba(102, 126, 234, 0.13);
 }
 
 .hero p {
@@ -46,25 +51,20 @@
   flex-wrap: wrap;
 }
 
-.hero-image img {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
-  border-radius: 18px;
-  box-shadow: 0 10px 32px rgba(102, 126, 234, 0.18);
-}
-
 .impact-stats {
-  padding: 0;
-  background: transparent;
+  padding: 3rem 0 2rem 0;
+  background: linear-gradient(90deg, #f4f6fb 60%, #e0e7ff 100%);
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.07);
 }
 
 .impact-stats h2 {
   text-align: center;
-  font-size: 2.3rem;
+  font-size: 2.5rem;
   margin-bottom: 2.5rem;
   color: #222;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -1px;
 }
 
 .stats-grid {
@@ -72,91 +72,111 @@
   flex-direction: row !important;
   flex-wrap: nowrap !important;
   justify-content: center;
-  gap: 2rem;
+  gap: 2.5rem;
   align-items: center;
   overflow-x: auto;
   padding: 1rem 0;
+  animation: fadeIn 1.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .stat-card {
-  background: #fff;
-  padding: 2.2rem 1.5rem;
-  border-radius: 15px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 22px;
   text-align: center;
-  box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.13);
   transition: box-shadow 0.2s, transform 0.2s;
   display: flex !important;
   flex-direction: column !important;
   align-items: center;
   justify-content: center;
   aspect-ratio: 1 / 1;
-  width: 200px !important;
-  height: 200px !important;
+  width: 210px !important;
+  height: 210px !important;
   margin: 0 !important;
   flex-shrink: 0 !important;
-  min-width: 200px !important;
+  min-width: 210px !important;
+  position: relative;
+  animation: fadeIn 1.2s;
 }
 
 .stat-card:hover {
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.18);
-  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.18);
+  transform: translateY(-4px) scale(1.05);
+}
+
+.stat-icon {
+  font-size: 2.7rem;
+  color: #667eea;
+  margin-bottom: 1.1rem;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-number {
-  font-size: 2.2rem;
-  font-weight: 700;
+  font-size: 2.3rem;
+  font-weight: 800;
   color: #667eea;
   margin-bottom: 0.5rem;
+  letter-spacing: -1px;
 }
 
 .stat-label {
   color: #666;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 500;
 }
 
 .featured-schools {
   padding: 4rem 0 2rem 0;
+  background: none;
 }
 
 .featured-schools h2 {
   text-align: center;
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   margin-bottom: 2.5rem;
   color: #222;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -1px;
 }
 
 .schools-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: center;
   margin-bottom: 2.5rem;
+  animation: fadeIn 1.2s;
 }
 
 .school-card {
-  background: #fff;
-  border-radius: 15px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.13);
   transition: box-shadow 0.2s, transform 0.2s;
   display: flex;
   flex-direction: column;
+  width: 350px;
+  min-width: 260px;
+  max-width: 100%;
+  position: relative;
+  animation: fadeIn 1.2s;
 }
 
 .school-card:hover {
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.18);
-  transform: translateY(-2px) scale(1.01);
-}
-
-.school-image {
-  position: relative;
-  height: 200px;
-}
-
-.school-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.18);
+  transform: translateY(-4px) scale(1.04);
 }
 
 .funding-progress {
@@ -164,18 +184,20 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 5px;
-  background-color: rgba(255, 255, 255, 0.3);
+  height: 10px;
+  background-color: #e9ecef;
+  border-radius: 0 0 22px 22px;
 }
 
 .progress-bar {
   height: 100%;
   background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   transition: width 0.3s;
+  border-radius: 0 0 22px 22px;
 }
 
 .school-content {
-  padding: 1.5rem;
+  padding: 1.7rem 1.5rem 1.2rem 1.5rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -183,7 +205,7 @@
 }
 
 .school-content h3 {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
   color: #222;
   font-weight: 700;
@@ -204,14 +226,55 @@
 .school-needs {
   margin-bottom: 1rem;
   font-size: 1rem;
-  color: #666;
+  color: #764ba2;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.school-needs strong {
+  margin-right: 0.5rem;
+}
+
+.school-needs .need-badge {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.2rem 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+  display: inline-block;
 }
 
 .school-funding {
   margin-bottom: 1.2rem;
-  font-size: 1rem;
+  font-size: 1.08rem;
   color: #28a745;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.btn.btn-primary {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  padding: 0.95rem 2.3rem;
+  font-weight: 700;
+  font-size: 1.13rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.10);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  margin-top: 0.7rem;
+}
+
+.btn.btn-primary:hover {
+  background: #fff;
+  color: #667eea;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+  border: 1.5px solid #667eea;
 }
 
 .text-center {
@@ -288,9 +351,6 @@
   .hero h1 {
     font-size: 2.2rem;
   }
-  .hero-image img {
-    height: 250px;
-  }
   .stats-grid {
     display: flex !important;
     flex-direction: row !important;
@@ -302,6 +362,14 @@
     height: 140px !important;
     min-width: 140px !important;
     flex-shrink: 0 !important;
+  }
+  .schools-grid {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .school-card {
+    width: 100%;
+    min-width: unset;
   }
   .schools-grid, .steps-grid {
     grid-template-columns: 1fr;

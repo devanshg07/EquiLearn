@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 // import { mockImpactStats, mockSchools } from '../data/mockData';
 import './Home.css';
+import { FaDollarSign, FaSchool, FaUserGraduate, FaHandHoldingHeart } from 'react-icons/fa';
 
 interface ImpactStats {
   totalDonations: number;
@@ -20,6 +21,51 @@ interface School {
   currentFunding: number;
   imageUrl?: string;
   category?: string;
+}
+
+const fallbackImpactStats: ImpactStats = {
+  totalDonations: 2847,
+  schoolsSupported: 15,
+  studentsImpacted: 8500,
+  totalFunding: 125000
+};
+
+// Helper for circular progress
+function FundingCircle({ percent }: { percent: number }) {
+  const radius = 22;
+  const stroke = 5;
+  const normalizedRadius = radius - stroke / 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset = circumference - percent / 100 * circumference;
+  return (
+    <svg height={radius * 2} width={radius * 2} style={{ marginRight: 8 }}>
+      <circle
+        stroke="#e9ecef"
+        fill="transparent"
+        strokeWidth={stroke}
+        r={normalizedRadius}
+        cx={radius}
+        cy={radius}
+      />
+      <circle
+        stroke="url(#grad)"
+        fill="transparent"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={circumference + ' ' + circumference}
+        style={{ strokeDashoffset, transition: 'stroke-dashoffset 0.5s' }}
+        r={normalizedRadius}
+        cx={radius}
+        cy={radius}
+      />
+      <defs>
+        <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#667eea" />
+          <stop offset="100%" stopColor="#764ba2" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
 }
 
 const Home: React.FC = () => {
@@ -52,6 +98,7 @@ const Home: React.FC = () => {
   }, []);
 
   const featuredSchools = schools.slice(0, 3);
+  const stats = impactStats || fallbackImpactStats;
 
   return (
     <div className="home">
@@ -74,67 +121,41 @@ const Home: React.FC = () => {
           <h2>Our Impact</h2>
           {loading && <div>Loading impact stats...</div>}
           {error && <div style={{ color: 'red' }}>{error}</div>}
-          {impactStats && (
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-number">${impactStats.totalFunding.toLocaleString()}</div>
-                <div className="stat-label">Total Funding Raised</div>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon"><FaDollarSign /></div>
+              <div className="stat-number">
+                {typeof stats.totalFunding === 'number' ? `$${stats.totalFunding.toLocaleString()}` : 'N/A'}
               </div>
-              <div className="stat-card">
-                <div className="stat-number">{impactStats.schoolsSupported}</div>
-                <div className="stat-label">Schools Supported</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{impactStats.studentsImpacted.toLocaleString()}</div>
-                <div className="stat-label">Students Impacted</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{impactStats.totalDonations.toLocaleString()}</div>
-                <div className="stat-label">Total Donations</div>
-              </div>
+              <div className="stat-label">Total Funding Raised</div>
             </div>
-          )}
+            <div className="stat-card">
+              <div className="stat-icon"><FaSchool /></div>
+              <div className="stat-number">
+                {typeof stats.schoolsSupported === 'number' ? stats.schoolsSupported.toLocaleString() : 'N/A'}
+              </div>
+              <div className="stat-label">Schools Supported</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon"><FaUserGraduate /></div>
+              <div className="stat-number">
+                {typeof stats.studentsImpacted === 'number' ? stats.studentsImpacted.toLocaleString() : 'N/A'}
+              </div>
+              <div className="stat-label">Students Impacted</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon"><FaHandHoldingHeart /></div>
+              <div className="stat-number">
+                {typeof stats.totalDonations === 'number' ? stats.totalDonations.toLocaleString() : 'N/A'}
+              </div>
+              <div className="stat-label">Total Donations</div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Featured Schools */}
-      <section className="featured-schools">
-        <div className="container">
-          <h2>Featured Schools</h2>
-          {loading && <div>Loading schools...</div>}
-          {error && <div style={{ color: 'red' }}>{error}</div>}
-          <div className="schools-grid">
-            {featuredSchools.map((school) => (
-              <div key={school.id} className="school-card">
-                <div className="school-image">
-                  <img src={school.imageUrl || ''} alt={school.name} />
-                  <div className="funding-progress">
-                    <div 
-                      className="progress-bar" 
-                      style={{ width: `${(school.currentFunding / school.fundingGoal) * 100 || 0}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="school-content">
-                  <h3>{school.name}</h3>
-                  <p className="school-location">{school.location}</p>
-                  <p className="school-description">{school.description}</p>
-                  <div className="school-needs">
-                    <strong>Needs:</strong> {Array.isArray(school.needs) ? school.needs.join(', ') : ''}
-                  </div>
-                  <div className="school-funding">
-                    <span>${school.currentFunding?.toLocaleString?.() || 0} raised of ${school.fundingGoal?.toLocaleString?.() || 0}</span>
-                  </div>
-                  <Link to={`/schools/${school.id}`} className="btn btn-outline">Learn More</Link>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <Link to="/schools" className="btn btn-primary">View All Schools</Link>
-          </div>
-        </div>
-      </section>
+      {/* (Removed: Only show after login) */}
 
       {/* How It Works */}
       <section className="how-it-works">

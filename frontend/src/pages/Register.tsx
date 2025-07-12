@@ -13,7 +13,8 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'donor' as 'donor' | 'admin'
+    role: 'donor' as 'donor' | 'admin',
+    city: ''
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -23,6 +24,25 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleUseLocation = async () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      // Use a free reverse geocoding API (e.g., OpenStreetMap Nominatim)
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        const city = data.address.city || data.address.town || data.address.village || data.address.state || '';
+        setFormData(f => ({ ...f, city }));
+      } catch {
+        setError('Could not determine your city from location');
+      }
+    }, () => setError('Could not get your location'));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,7 +65,8 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
       name: formData.name,
       email: formData.email,
       role: formData.role,
-      totalDonated: 0
+      totalDonated: 0,
+      city: formData.city
     };
 
     onRegister(newUser);
@@ -126,6 +147,22 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 required
                 placeholder="Confirm your password"
               />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="city">City</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                required
+                placeholder="Enter your city"
+              />
+              <button type="button" className="btn btn-secondary" style={{ marginTop: 8 }} onClick={handleUseLocation}>
+                Use my location
+              </button>
             </div>
             
             <button type="submit" className="btn btn-primary">

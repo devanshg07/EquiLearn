@@ -26,6 +26,7 @@ export interface User {
   email: string;
   role: 'donor' | 'admin';
   totalDonated?: number;
+  city?: string;
 }
 
 export interface ImpactStats {

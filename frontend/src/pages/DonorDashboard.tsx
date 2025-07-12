@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from '../types';
-import { mockDonations, mockMicroDonationPools } from '../data/mockData';
+import { mockDonations, mockMicroDonationPools, mockSchools } from '../data/mockData';
 import './Dashboard.css';
 
 interface DonorDashboardProps {
@@ -37,6 +37,44 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
                 <div className="stat-label">Schools Supported</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Featured Schools (only after login) */}
+        <div className="dashboard-section">
+          <h2>Featured Schools Near You</h2>
+          <div className="schools-grid">
+            {mockSchools.slice(0, 3).map((school) => {
+              const percent = school.fundingGoal ? Math.round((school.currentFunding / school.fundingGoal) * 100) : 0;
+              return (
+                <div key={school.id} className="school-card">
+                  <div className="school-content">
+                    <h3>{school.name}</h3>
+                    <p className="school-location">{school.location}</p>
+                    <p className="school-description">{school.description}</p>
+                    <div className="school-needs">
+                      <strong>Needs:</strong>
+                      {Array.isArray(school.needs) && school.needs.length > 0
+                        ? school.needs.map((need, i) => (
+                            <span className="need-badge" key={i}>{need}</span>
+                          ))
+                        : <span className="need-badge">N/A</span>}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                      <div className="school-funding">
+                        <span>
+                          <b>${school.currentFunding?.toLocaleString?.() || 0}</b> raised of <b>${school.fundingGoal?.toLocaleString?.() || 0}</b>
+                        </span>
+                      </div>
+                      <div className="funding-progress" style={{ flex: 1, marginLeft: 12 }}>
+                        <div className="progress-bar" style={{ width: `${percent}%` }}></div>
+                      </div>
+                    </div>
+                    <button className="btn btn-primary">Donate</button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
