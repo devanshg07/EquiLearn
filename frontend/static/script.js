@@ -8,122 +8,52 @@ let adminData = {
     schools: []
 };
 
-// Sample data initialization
-function initializeData() {
-    schoolsData = [
-        {
-            id: 1,
-            name: "Oakwood Middle School",
-            location: "urban",
-            city: "Springfield",
-            state: "IL",
-            needs: [
-                {
-                    id: 1,
-                    title: "Chromebooks for Grade 6",
-                    description: "Need 5 Chromebooks for our 6th grade computer lab",
-                    category: "Technology",
-                    urgency: "high",
-                    totalNeeded: 5,
-                    currentDonations: 2,
-                    costPerItem: 300,
-                    totalCost: 1500
-                },
-                {
-                    id: 2,
-                    title: "Science Lab Equipment",
-                    description: "Microscopes and lab supplies for biology class",
-                    category: "STEM",
-                    urgency: "medium",
-                    totalNeeded: 10,
-                    currentDonations: 3,
-                    costPerItem: 150,
-                    totalCost: 1500
-                }
-            ]
-        },
-        {
-            id: 2,
-            name: "Riverside Elementary",
-            location: "rural",
-            city: "Farmville",
-            state: "NC",
-            needs: [
-                {
-                    id: 3,
-                    title: "Art Supplies",
-                    description: "Paint, brushes, and canvas for art class",
-                    category: "Art",
-                    urgency: "low",
-                    totalNeeded: 50,
-                    currentDonations: 15,
-                    costPerItem: 5,
-                    totalCost: 250
-                }
-            ]
-        },
-        {
-            id: 3,
-            name: "Lincoln High School",
-            location: "suburban",
-            city: "Fairview",
-            state: "CA",
-            needs: [
-                {
-                    id: 4,
-                    title: "Sports Equipment",
-                    description: "Basketballs, soccer balls, and gym equipment",
-                    category: "Sports",
-                    urgency: "medium",
-                    totalNeeded: 20,
-                    currentDonations: 8,
-                    costPerItem: 25,
-                    totalCost: 500
-                },
-                {
-                    id: 5,
-                    title: "Library Books",
-                    description: "New fiction and non-fiction books for library",
-                    category: "Books",
-                    urgency: "low",
-                    totalNeeded: 100,
-                    currentDonations: 30,
-                    costPerItem: 15,
-                    totalCost: 1500
-                }
-            ]
+// API Base URL
+const API_BASE = '';
+
+// Initialize data from backend
+async function initializeData() {
+    try {
+        // Load schools data from backend
+        const response = await fetch(`${API_BASE}/api/schools`);
+        if (response.ok) {
+            schoolsData = await response.json();
+        } else {
+            console.error('Failed to load schools data');
+            schoolsData = [];
         }
-    ];
 
-    adminData.pendingNeeds = [
-        {
-            id: 6,
-            schoolName: "New Hope Academy",
-            title: "Math Software Licenses",
-            description: "Online math learning platform for grades 3-5",
-            category: "STEM",
-            urgency: "high",
-            totalCost: 2000,
-            submittedDate: "2024-01-15"
+        // Load impact statistics
+        const impactResponse = await fetch(`${API_BASE}/api/impact`);
+        if (impactResponse.ok) {
+            const impactStats = await impactResponse.json();
+            updateHeroStats(impactStats);
         }
-    ];
 
-    adminData.approvedNeeds = schoolsData.flatMap(school => 
-        school.needs.map(need => ({
-            ...need,
-            schoolName: school.name,
-            approvedDate: "2024-01-10"
-        }))
-    );
+        // Load donation history if user is logged in
+        if (isUserLoggedIn()) {
+            await loadDonationHistory();
+        }
 
-    adminData.schools = schoolsData.map(school => ({
-        id: school.id,
-        name: school.name,
-        location: school.location,
-        city: school.city,
-        state: school.state,
-        needsCount: school.needs.length
-    }));
+        renderSchools();
+        updateImpactDashboard();
+    } catch (error) {
+        console.error('Error initializing data:', error);
+    }
+}
+
+function updateHeroStats(stats) {
+    const statElements = document.querySelectorAll('.stat h3');
+    if (statElements.length >= 3) {
+        statElements[0].textContent = `$${(stats.total_donations / 1000000).toFixed(1)}M+`;
+        statElements[1].textContent = `${stats.schools_helped}+`;
+        statElements[2].textContent = `${(stats.students_impacted / 1000).toFixed(0)}K+`;
+    }
+}
+
+function isUserLoggedIn() {
+    // Check if user is logged in (you can implement session checking)
+    return false; // For now, assume not logged in
 }
 
 // Navigation functionality
@@ -339,80 +269,97 @@ function selectAmount(amount) {
     document.getElementById('poolDonationAmount').value = amount;
 }
 
-function processDonation(type, needId = null) {
+async function processDonation(type, needId = null) {
     const modal = document.getElementById('donationModal');
     
-    if (type === 'direct') {
-        const donorName = document.getElementById('donorName').value;
-        const donorEmail = document.getElementById('donorEmail').value;
-        const amount = parseFloat(document.getElementById('donationAmount').value);
-        const message = document.getElementById('donationMessage').value;
+    try {
+        let donationData = {
+            donation_type: type,
+            amount: 0
+        };
 
-        if (!donorName || !donorEmail || !amount) {
-            alert('Please fill in all required fields.');
-            return;
+        if (type === 'direct') {
+            const donorName = document.getElementById('donorName').value;
+            const donorEmail = document.getElementById('donorEmail').value;
+            const amount = parseFloat(document.getElementById('donationAmount').value);
+            const message = document.getElementById('donationMessage').value;
+
+            if (!donorName || !donorEmail || !amount) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            donationData = {
+                donation_type: 'direct',
+                need_id: needId,
+                amount: amount,
+                donor_name: donorName,
+                message: message
+            };
+
+        } else if (type === 'pool') {
+            const donorName = document.getElementById('poolDonorName').value;
+            const donorEmail = document.getElementById('poolDonorEmail').value;
+            const amount = parseFloat(document.getElementById('poolDonationAmount').value);
+
+            if (!donorName || !donorEmail || !amount) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            donationData = {
+                donation_type: 'pool',
+                amount: amount,
+                donor_name: donorName
+            };
         }
 
-        const need = findNeedById(needId);
-        const itemsFunded = Math.floor(amount / need.costPerItem);
-        
-        // Update the need's current donations
-        updateNeedDonations(needId, itemsFunded);
-        
-        // Add to donation history
-        addDonationToHistory({
-            type: 'direct',
-            donorName,
-            donorEmail,
-            amount,
-            schoolName: need.schoolName,
-            needTitle: need.title,
-            itemsFunded,
-            date: new Date().toISOString(),
-            message
+        // Send donation to backend
+        const response = await fetch(`${API_BASE}/api/donations`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(donationData)
         });
 
-        alert(`Thank you for your donation of $${amount}! You've helped fund ${itemsFunded} item(s) for ${need.schoolName}.`);
-        
-    } else if (type === 'pool') {
-        const donorName = document.getElementById('poolDonorName').value;
-        const donorEmail = document.getElementById('poolDonorEmail').value;
-        const amount = parseFloat(document.getElementById('poolDonationAmount').value);
+        if (response.ok) {
+            const result = await response.json();
+            
+            if (type === 'direct') {
+                const need = findNeedById(needId);
+                const itemsFunded = Math.floor(donationData.amount / need.costPerItem);
+                alert(`Thank you for your donation of $${donationData.amount}! You've helped fund ${itemsFunded} item(s) for ${need.schoolName}.`);
+            } else {
+                alert(`Thank you for joining our microdonation pool with $${donationData.amount}! Your contribution will help multiple schools.`);
+            }
 
-        if (!donorName || !donorEmail || !amount) {
-            alert('Please fill in all required fields.');
-            return;
+            // Refresh data
+            await initializeData();
+            
+        } else {
+            const error = await response.json();
+            alert(`Error: ${error.error || 'Failed to process donation'}`);
         }
 
-        addDonationToHistory({
-            type: 'pool',
-            donorName,
-            donorEmail,
-            amount,
-            date: new Date().toISOString()
-        });
-
-        alert(`Thank you for joining our microdonation pool with $${amount}! Your contribution will help multiple schools.`);
+    } catch (error) {
+        console.error('Error processing donation:', error);
+        alert('An error occurred while processing your donation. Please try again.');
     }
 
     modal.style.display = 'none';
-    updateImpactDashboard();
 }
 
-function updateNeedDonations(needId, itemsFunded) {
-    for (const school of schoolsData) {
-        const need = school.needs.find(n => n.id === needId);
-        if (need) {
-            need.currentDonations = Math.min(need.currentDonations + itemsFunded, need.totalNeeded);
-            break;
+async function loadDonationHistory() {
+    try {
+        const response = await fetch(`${API_BASE}/api/donations`);
+        if (response.ok) {
+            donationsData = await response.json();
+            updateDonationHistory();
         }
+    } catch (error) {
+        console.error('Error loading donation history:', error);
     }
-    renderSchools();
-}
-
-function addDonationToHistory(donation) {
-    donationsData.unshift(donation);
-    updateDonationHistory();
 }
 
 function updateDonationHistory() {
@@ -426,8 +373,8 @@ function updateDonationHistory() {
     historyList.innerHTML = donationsData.slice(0, 10).map(donation => `
         <div class="history-item">
             <div class="history-info">
-                <h4>${donation.type === 'direct' ? donation.needTitle : 'Microdonation Pool'}</h4>
-                <p>${donation.type === 'direct' ? donation.schoolName : 'Multiple Schools'}</p>
+                <h4>${donation.type === 'direct' ? (donation.need_title || 'Direct Donation') : 'Microdonation Pool'}</h4>
+                <p>${donation.type === 'direct' ? (donation.school_name || 'Unknown School') : 'Multiple Schools'}</p>
                 <p>${new Date(donation.date).toLocaleDateString()}</p>
             </div>
             <div class="history-amount">$${donation.amount}</div>
@@ -437,7 +384,7 @@ function updateDonationHistory() {
 
 function updateImpactDashboard() {
     const totalDonations = donationsData.reduce((sum, donation) => sum + donation.amount, 0);
-    const schoolsSupported = new Set(donationsData.filter(d => d.type === 'direct').map(d => d.schoolName)).size;
+    const schoolsSupported = new Set(donationsData.filter(d => d.type === 'direct').map(d => d.school_name)).size;
     const studentsHelped = Math.floor(totalDonations / 100); // Rough estimate
 
     document.querySelector('#impactDashboard .impact-card:nth-child(1) .impact-number').textContent = `$${totalDonations.toLocaleString()}`;
@@ -449,40 +396,67 @@ function updateImpactDashboard() {
 function setupAdmin() {
     const loginForm = document.getElementById('loginForm');
     
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = loginForm.querySelector('input[type="email"]').value;
         const password = loginForm.querySelector('input[type="password"]').value;
         
-        // Simple admin check (in real app, this would be server-side)
-        if (email === 'admin@equilearn.org' && password === 'admin123') {
-            adminData.isLoggedIn = true;
-            document.getElementById('adminLogin').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'block';
-            renderAdminDashboard();
-        } else {
-            alert('Invalid credentials. Use admin@equilearn.org / admin123');
+        try {
+            const response = await fetch(`${API_BASE}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                adminData.isLoggedIn = true;
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                await renderAdminDashboard();
+            } else {
+                const error = await response.json();
+                alert(error.error || 'Invalid credentials');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please try again.');
         }
     });
 }
 
-function renderAdminDashboard() {
-    renderPendingNeeds();
-    renderApprovedNeeds();
-    renderSchoolsList();
+async function renderAdminDashboard() {
+    await renderPendingNeeds();
+    await renderApprovedNeeds();
+    await renderSchoolsList();
 }
 
-function renderPendingNeeds() {
+async function renderPendingNeeds() {
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/needs/pending`);
+        if (response.ok) {
+            adminData.pendingNeeds = await response.json();
+        }
+    } catch (error) {
+        console.error('Error loading pending needs:', error);
+    }
+
     const pendingNeeds = document.getElementById('pendingNeeds');
+    
+    if (adminData.pendingNeeds.length === 0) {
+        pendingNeeds.innerHTML = '<p style="text-align: center; color: #666;">No pending needs to review.</p>';
+        return;
+    }
     
     pendingNeeds.innerHTML = adminData.pendingNeeds.map(need => `
         <div class="need-item-admin">
             <h4>${need.title}</h4>
-            <p><strong>School:</strong> ${need.schoolName}</p>
+            <p><strong>School:</strong> ${need.school_name}</p>
             <p><strong>Category:</strong> ${need.category}</p>
             <p><strong>Urgency:</strong> ${need.urgency}</p>
-            <p><strong>Cost:</strong> $${need.totalCost}</p>
-            <p><strong>Submitted:</strong> ${need.submittedDate}</p>
+            <p><strong>Cost:</strong> $${need.total_cost}</p>
+            <p><strong>Submitted:</strong> ${need.submitted_date}</p>
             <p><strong>Description:</strong> ${need.description}</p>
             <div class="admin-actions">
                 <button class="btn-approve" onclick="approveNeed(${need.id})">Approve</button>
@@ -492,51 +466,87 @@ function renderPendingNeeds() {
     `).join('');
 }
 
-function renderApprovedNeeds() {
+async function renderApprovedNeeds() {
     const approvedNeeds = document.getElementById('approvedNeeds');
-    
-    approvedNeeds.innerHTML = adminData.approvedNeeds.map(need => `
-        <div class="need-item-admin">
-            <h4>${need.title}</h4>
-            <p><strong>School:</strong> ${need.schoolName}</p>
-            <p><strong>Category:</strong> ${need.category}</p>
-            <p><strong>Urgency:</strong> ${need.urgency}</p>
-            <p><strong>Progress:</strong> ${need.currentDonations}/${need.totalNeeded} items</p>
-            <p><strong>Approved:</strong> ${need.approvedDate}</p>
-        </div>
-    `).join('');
+    approvedNeeds.innerHTML = '<p style="text-align: center; color: #666;">Approved needs are displayed in the main schools section.</p>';
 }
 
-function renderSchoolsList() {
+async function renderSchoolsList() {
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/schools`);
+        if (response.ok) {
+            adminData.schools = await response.json();
+        }
+    } catch (error) {
+        console.error('Error loading schools:', error);
+    }
+
     const schoolsList = document.getElementById('schoolsList');
     
     schoolsList.innerHTML = adminData.schools.map(school => `
         <div class="school-item-admin">
             <h4>${school.name}</h4>
             <p><strong>Location:</strong> ${school.city}, ${school.state} (${school.location})</p>
-            <p><strong>Active Needs:</strong> ${school.needsCount}</p>
+            <p><strong>Verified:</strong> ${school.verified ? 'Yes' : 'No'}</p>
+            <p><strong>Active Needs:</strong> ${school.needs_count}</p>
+            ${!school.verified ? `<button class="btn-approve" onclick="verifySchool(${school.id})">Verify School</button>` : ''}
         </div>
     `).join('');
 }
 
-function approveNeed(needId) {
-    const needIndex = adminData.pendingNeeds.findIndex(need => need.id === needId);
-    if (needIndex !== -1) {
-        const need = adminData.pendingNeeds[needIndex];
-        adminData.pendingNeeds.splice(needIndex, 1);
-        adminData.approvedNeeds.push({
-            ...need,
-            approvedDate: new Date().toISOString().split('T')[0]
+async function approveNeed(needId) {
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/needs/${needId}/approve`, {
+            method: 'POST'
         });
-        renderAdminDashboard();
+
+        if (response.ok) {
+            alert('Need approved successfully!');
+            await renderAdminDashboard();
+            await initializeData(); // Refresh main data
+        } else {
+            alert('Failed to approve need');
+        }
+    } catch (error) {
+        console.error('Error approving need:', error);
+        alert('Error approving need');
     }
 }
 
-function rejectNeed(needId) {
-    const needIndex = adminData.pendingNeeds.findIndex(need => need.id === needId);
-    if (needIndex !== -1) {
-        adminData.pendingNeeds.splice(needIndex, 1);
-        renderAdminDashboard();
+async function rejectNeed(needId) {
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/needs/${needId}/reject`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            alert('Need rejected successfully!');
+            await renderAdminDashboard();
+        } else {
+            alert('Failed to reject need');
+        }
+    } catch (error) {
+        console.error('Error rejecting need:', error);
+        alert('Error rejecting need');
+    }
+}
+
+async function verifySchool(schoolId) {
+    try {
+        const response = await fetch(`${API_BASE}/api/admin/schools/${schoolId}/verify`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            alert('School verified successfully!');
+            await renderAdminDashboard();
+            await initializeData(); // Refresh main data
+        } else {
+            alert('Failed to verify school');
+        }
+    } catch (error) {
+        console.error('Error verifying school:', error);
+        alert('Error verifying school');
     }
 }
 
@@ -560,14 +570,11 @@ function showTab(tabName) {
 
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initializeData();
     setupNavigation();
     setupFilters();
     setupModal();
     setupAdmin();
-    renderSchools();
-    updateDonationHistory();
-    updateImpactDashboard();
+    initializeData();
     
     // Add smooth scrolling for all anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
