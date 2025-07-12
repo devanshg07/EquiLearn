@@ -14,7 +14,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     password: '',
     confirmPassword: '',
     role: 'donor' as 'donor' | 'admin',
-    city: ''
+    city: '',
+    latitude: '',
+    longitude: ''
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
         const data = await res.json();
         const city = data.address.city || data.address.town || data.address.village || data.address.state || '';
-        setFormData(f => ({ ...f, city }));
+        setFormData(f => ({ ...f, city, latitude: latitude.toString(), longitude: longitude.toString() }));
       } catch {
         setError('Could not determine your city from location');
       }
@@ -163,6 +165,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
               <button type="button" className="btn btn-secondary" style={{ marginTop: 8 }} onClick={handleUseLocation}>
                 Use my location
               </button>
+              {/* Hidden fields for coordinates */}
+              <input type="hidden" name="latitude" value={formData.latitude} />
+              <input type="hidden" name="longitude" value={formData.longitude} />
             </div>
             
             <button type="submit" className="btn btn-primary">

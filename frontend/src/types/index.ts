@@ -27,6 +27,8 @@ export interface User {
   role: 'donor' | 'admin';
   totalDonated?: number;
   city?: string;
+  latitude?: string;
+  longitude?: string;
 }
 
 export interface ImpactStats {

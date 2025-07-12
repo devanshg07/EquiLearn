@@ -3,13 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 import openai
 openai.api_key = os.getenv('OPENAI_API_KEY')
 import re
 import json
+from models import FeaturedSchool
 
 # Load environment variables
 load_dotenv()
@@ -344,22 +345,53 @@ def get_impact_stats():
 @app.route('/api/featured-schools')
 def featured_schools():
     city = request.args.get('city')
+    user_id = request.args.get('user_id')  # Optionally associate with user
     if not city:
         return jsonify({'error': 'City is required'}), 400
-    prompt = f"List 3 real K-12 schools in {city}, with a short description and what they need donations for. Format as JSON: [{{'name':..., 'location':..., 'description':..., 'needs':...}}]"
+    # Check DB first for this city only
+    query = FeaturedSchool.query.filter_by(city=city)
+    if user_id:
+        query = query.filter_by(user_id=user_id)
+    schools = query.all()
+    if schools:
+        # Return cached schools for this city
+        return jsonify([
+            {
+                'name': s.name,
+                'location': s.location,
+                'description': s.description,
+                'needs': json.loads(s.needs) if s.needs else []
+            } for s in schools
+        ])
+    # If not found, call OpenAI with improved prompt
+    prompt = (
+        f"List 3 real K-12 schools in {city}, Canada, with a short description and a list of needs as an array of strings (not objects). "
+        f"Format as JSON: [{{'name':..., 'location':..., 'description':..., 'needs': [string, ...]}}]"
+    )
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=300
+            max_tokens=400
         )
-        # Try to extract JSON from the response
+        import re
         match = re.search(r'\[.*\]', response['choices'][0]['message']['content'], re.DOTALL)
         if match:
-            schools = json.loads(match.group(0))
+            schools_data = json.loads(match.group(0))
         else:
-            schools = []
-        return jsonify(schools)
+            schools_data = []
+        # Save to DB for this city
+        for s in schools_data:
+            db.session.add(FeaturedSchool(
+                user_id=user_id,
+                city=city,
+                name=s.get('name',''),
+                location=s.get('location',''),
+                description=s.get('description',''),
+                needs=json.dumps(s.get('needs', []))
+            ))
+        db.session.commit()
+        return jsonify(schools_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -405,6 +437,8 @@ def login():
         user = User.query.filter_by(email=data['email']).first()
         if user and check_password_hash(user.password_hash, data['password']):
             login_user(user)
+            session.permanent = True
+            app.permanent_session_lifetime = timedelta(days=30)
             return jsonify({'message': 'Login successful'})
         return jsonify({'error': 'Invalid credentials'}), 401
     # If already logged in, redirect to main page

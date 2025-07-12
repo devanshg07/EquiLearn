@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { User } from '../types';
-import { mockDonations, mockMicroDonationPools, mockSchools } from '../data/mockData';
+import { mockDonations, mockMicroDonationPools } from '../data/mockData';
 import './Dashboard.css';
 
 interface DonorDashboardProps {
@@ -10,6 +10,26 @@ interface DonorDashboardProps {
 const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
   const userDonations = mockDonations.filter(d => d.donorName === user.name);
   const totalDonated = userDonations.reduce((sum, d) => sum + d.amount, 0);
+
+  // Featured schools state
+  const [featuredSchools, setFeaturedSchools] = useState<any[]>([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
+  const [errorSchools, setErrorSchools] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user.city) return;
+    setLoadingSchools(true);
+    fetch(`/api/featured-schools?city=${encodeURIComponent(user.city)}`)
+      .then(res => res.json())
+      .then(data => {
+        setFeaturedSchools(data);
+        setLoadingSchools(false);
+      })
+      .catch(err => {
+        setErrorSchools('Could not load featured schools');
+        setLoadingSchools(false);
+      });
+  }, [user.city]);
 
   return (
     <div className="dashboard">
@@ -42,20 +62,37 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
 
         {/* Featured Schools (only after login) */}
         <div className="dashboard-section">
-          <h2>Featured Schools Near You</h2>
+          <h2>Schools Near You</h2>
+          {loadingSchools && <div>Loading schools...</div>}
+          {errorSchools && <div style={{ color: 'red' }}>{errorSchools}</div>}
+          {(!loadingSchools && featuredSchools.length === 0) && (
+            <div>No schools found for your city.</div>
+          )}
           <div className="schools-grid">
-            {mockSchools.slice(0, 3).map((school) => {
-              const percent = school.fundingGoal ? Math.round((school.currentFunding / school.fundingGoal) * 100) : 0;
+            {featuredSchools.map((school, idx) => {
+              const percent = school.fundingGoal && school.currentFunding ? Math.round((school.currentFunding / school.fundingGoal) * 100) : 0;
+              // Fix needs display
+              let needsList: string[] = [];
+              if (Array.isArray(school.needs)) {
+                needsList = school.needs.map((need: any) => {
+                  if (typeof need === 'string') return need;
+                  if (typeof need === 'object' && need !== null) {
+                    // Try to get a string property
+                    return need.title || need.name || Object.values(need).find(v => typeof v === 'string') || JSON.stringify(need);
+                  }
+                  return String(need);
+                });
+              }
               return (
-                <div key={school.id} className="school-card">
+                <div key={school.name + idx} className="school-card">
                   <div className="school-content">
                     <h3>{school.name}</h3>
                     <p className="school-location">{school.location}</p>
                     <p className="school-description">{school.description}</p>
                     <div className="school-needs">
                       <strong>Needs:</strong>
-                      {Array.isArray(school.needs) && school.needs.length > 0
-                        ? school.needs.map((need, i) => (
+                      {needsList.length > 0
+                        ? needsList.map((need, i) => (
                             <span className="need-badge" key={i}>{need}</span>
                           ))
                         : <span className="need-badge">N/A</span>}

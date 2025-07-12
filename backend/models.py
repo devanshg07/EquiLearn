@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask_login import UserMixin
 from .extensions import db
+from sqlalchemy.dialects.sqlite import JSON
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,3 +45,12 @@ class Donation(db.Model):
     donation_type = db.Column(db.String(20), nullable=False)
     message = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow) 
+
+class FeaturedSchool(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=True)  # Optionally associate with a user
+    city = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    location = db.Column(db.String(100), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    needs = db.Column(db.Text, nullable=True)  # Store as JSON string 
