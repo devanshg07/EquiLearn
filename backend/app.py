@@ -338,29 +338,6 @@ def get_impact_stats():
     })
 
 # Authentication routes
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        data = request.get_json()
-        
-        if User.query.filter_by(email=data['email']).first():
-            return jsonify({'error': 'Email already registered'}), 400
-        
-        user = User(
-            email=data['email'],
-            password_hash=generate_password_hash(data['password']),
-            name=data['name'],
-            role=data.get('role', 'donor')
-        )
-        
-        db.session.add(user)
-        db.session.commit()
-        
-        login_user(user)
-        return jsonify({'message': 'Registration successful'}), 201
-    
-    return render_template('register.html')
-
 @app.route('/register/donor', methods=['GET', 'POST'])
 def register_donor():
     if request.method == 'POST':
