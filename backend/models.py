@@ -54,3 +54,5 @@ class FeaturedSchool(db.Model):
     location = db.Column(db.String(100), nullable=True)
     description = db.Column(db.Text, nullable=True)
     needs = db.Column(db.Text, nullable=True)  # Store as JSON string 
+    funding_goal = db.Column(db.Float, nullable=True)
+    current_funding = db.Column(db.Float, nullable=True) 

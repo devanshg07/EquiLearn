@@ -16,6 +16,31 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
   const [loadingSchools, setLoadingSchools] = useState(false);
   const [errorSchools, setErrorSchools] = useState<string | null>(null);
 
+  // Add state for donation amounts and loading
+  const [donationAmounts, setDonationAmounts] = useState<{ [key: number]: number }>({});
+  const [donationLoading, setDonationLoading] = useState<{ [key: number]: boolean }>({});
+
+  const handleDonate = async (schoolId: number, idx: number) => {
+    const amount = donationAmounts[schoolId];
+    if (!amount || amount <= 0) return;
+    setDonationLoading(l => ({ ...l, [schoolId]: true }));
+    try {
+      const res = await fetch('/api/featured-schools/donate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ school_id: schoolId, amount })
+      });
+      const data = await res.json();
+      if (data.currentFunding !== undefined) {
+        setFeaturedSchools(schools => schools.map((s, i) =>
+          i === idx ? { ...s, currentFunding: data.currentFunding } : s
+        ));
+        setDonationAmounts(a => ({ ...a, [schoolId]: 0 }));
+      }
+    } catch (e) {}
+    setDonationLoading(l => ({ ...l, [schoolId]: false }));
+  };
+
   useEffect(() => {
     if (!user.city) return;
     setLoadingSchools(true);
@@ -107,7 +132,23 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
                         <div className="progress-bar" style={{ width: `${percent}%` }}></div>
                       </div>
                     </div>
-                    <button className="btn btn-primary">Donate</button>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                      <input
+                        type="number"
+                        min={1}
+                        placeholder="Amount"
+                        value={donationAmounts[school.id] || ''}
+                        onChange={e => setDonationAmounts(a => ({ ...a, [school.id]: Number(e.target.value) }))}
+                        style={{ width: 80 }}
+                      />
+                      <button
+                        className="btn btn-primary"
+                        disabled={donationLoading[school.id] || !donationAmounts[school.id] || donationAmounts[school.id] <= 0}
+                        onClick={() => handleDonate(school.id, idx)}
+                      >
+                        {donationLoading[school.id] ? 'Donating...' : 'Donate'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

@@ -12,6 +12,8 @@ import re
 import json
 from models import User, School, Need, Donation, FeaturedSchool
 from extensions import db, login_manager
+from flask_migrate import Migrate
+import random
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Get the absolute paths to frontend directories
@@ -29,6 +31,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///equilearn.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+migrate = Migrate(app, db)
 CORS(app)
 login_manager.init_app(app)
 
@@ -311,16 +314,19 @@ def featured_schools():
         # Return cached schools for this city
         return jsonify([
             {
+                'id': s.id,
                 'name': s.name,
                 'location': s.location,
                 'description': s.description,
-                'needs': json.loads(s.needs) if s.needs else []
+                'needs': json.loads(s.needs) if s.needs else [],
+                'fundingGoal': s.funding_goal,
+                'currentFunding': s.current_funding
             } for s in schools
         ])
     # If not found, call OpenAI with improved prompt
     prompt = (
-        f"List 3 real K-12 schools in {city}, Canada, with a short description and a list of needs as an array of strings (not objects). "
-        f"Format as JSON: [{{'name':..., 'location':..., 'description':..., 'needs': [string, ...]}}]"
+        f"List 3 real K-12 schools in {city}, Canada, with a short description, a list of needs as an array of strings (not objects), a fundingGoal (a realistic total fundraising goal in USD), and currentFunding (a plausible amount already raised, less than fundingGoal). "
+        f"Format as JSON: [{{'name':..., 'location':..., 'description':..., 'needs': [string, ...], 'fundingGoal': ..., 'currentFunding': ...}}]"
     )
     try:
         response = openai.ChatCompletion.create(
@@ -334,6 +340,12 @@ def featured_schools():
             schools_data = json.loads(match.group(0))
         else:
             schools_data = []
+        # Ensure each school has unique, reasonable funding values
+        for s in schools_data:
+            if not s.get('fundingGoal') or not isinstance(s['fundingGoal'], (int, float)):
+                s['fundingGoal'] = random.randint(5000, 20000)
+            if not s.get('currentFunding') or not isinstance(s['currentFunding'], (int, float)) or s['currentFunding'] >= s['fundingGoal']:
+                s['currentFunding'] = random.randint(0, int(s['fundingGoal'] * 0.7))
         # Save to DB for this city
         for s in schools_data:
             db.session.add(FeaturedSchool(
@@ -342,12 +354,34 @@ def featured_schools():
                 name=s.get('name',''),
                 location=s.get('location',''),
                 description=s.get('description',''),
-                needs=json.dumps(s.get('needs', []))
+                needs=json.dumps(s.get('needs', [])),
+                funding_goal=s.get('fundingGoal'),
+                current_funding=s.get('currentFunding')
             ))
         db.session.commit()
         return jsonify(schools_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/featured-schools/donate', methods=['POST'])
+def donate_to_featured_school():
+    data = request.get_json()
+    school_id = data.get('school_id')
+    amount = data.get('amount')
+    if not school_id or not amount or amount <= 0:
+        return jsonify({'error': 'Invalid school_id or amount'}), 400
+    school = FeaturedSchool.query.get(school_id)
+    if not school:
+        return jsonify({'error': 'School not found'}), 404
+    if school.current_funding is None:
+        school.current_funding = 0
+    school.current_funding += amount
+    db.session.commit()
+    return jsonify({
+        'school_id': school.id,
+        'currentFunding': school.current_funding,
+        'fundingGoal': school.funding_goal
+    })
 
 # Authentication routes
 @app.route('/register/donor', methods=['GET', 'POST'])
