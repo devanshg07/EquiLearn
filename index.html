@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EquiLearn - Connecting Schools with Donors</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>EquiLearn</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#schools" class="nav-link">Schools</a></li>
+                <li><a href="#donate" class="nav-link">Donate</a></li>
+                <li><a href="#impact" class="nav-link">Impact</a></li>
+                <li><a href="#admin" class="nav-link">Admin</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Empowering Education Through Generosity</h1>
+            <p>Connect schools in need with generous donors. Every contribution makes a difference in a child's education.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="scrollToSection('schools')">Find Schools</button>
+                <button class="btn btn-secondary" onclick="scrollToSection('donate')">Make a Donation</button>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <h3>150+</h3>
+                <p>Schools Helped</p>
+            </div>
+            <div class="stat">
+                <h3>$2.5M+</h3>
+                <p>Total Donations</p>
+            </div>
+            <div class="stat">
+                <h3>15K+</h3>
+                <p>Students Impacted</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schools Section -->
+    <section id="schools" class="schools-section">
+        <div class="container">
+            <h2>Schools in Need</h2>
+            <div class="filters">
+                <select id="locationFilter" class="filter-select">
+                    <option value="">All Locations</option>
+                    <option value="urban">Urban</option>
+                    <option value="rural">Rural</option>
+                    <option value="suburban">Suburban</option>
+                </select>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">All Categories</option>
+                    <option value="STEM">STEM</option>
+                    <option value="Art">Art</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Books">Books</option>
+                </select>
+                <select id="urgencyFilter" class="filter-select">
+                    <option value="">All Urgency Levels</option>
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                </select>
+            </div>
+            <div id="schoolsGrid" class="schools-grid">
+                <!-- Schools will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Donation Section -->
+    <section id="donate" class="donation-section">
+        <div class="container">
+            <h2>Make a Difference</h2>
+            <div class="donation-options">
+                <div class="donation-card">
+                    <h3>Direct Donation</h3>
+                    <p>Support a specific school's need</p>
+                    <button class="btn btn-primary" onclick="openDonationModal('direct')">Choose Need</button>
+                </div>
+                <div class="donation-card">
+                    <h3>Microdonation Pool</h3>
+                    <p>Contribute to our pooled funds</p>
+                    <button class="btn btn-primary" onclick="openDonationModal('pool')">Join Pool</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Tracking -->
+    <section id="impact" class="impact-section">
+        <div class="container">
+            <h2>Your Impact</h2>
+            <div id="impactDashboard" class="impact-dashboard">
+                <div class="impact-card">
+                    <h3>Total Donations</h3>
+                    <p class="impact-number">$0</p>
+                </div>
+                <div class="impact-card">
+                    <h3>Schools Supported</h3>
+                    <p class="impact-number">0</p>
+                </div>
+                <div class="impact-card">
+                    <h3>Students Helped</h3>
+                    <p class="impact-number">0</p>
+                </div>
+            </div>
+            <div id="donationHistory" class="donation-history">
+                <h3>Recent Donations</h3>
+                <div id="historyList" class="history-list">
+                    <!-- Donation history will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section id="admin" class="admin-section">
+        <div class="container">
+            <h2>Admin Panel</h2>
+            <div class="admin-login" id="adminLogin">
+                <h3>Admin Login</h3>
+                <form id="loginForm" class="login-form">
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+            <div class="admin-dashboard" id="adminDashboard" style="display: none;">
+                <div class="admin-tabs">
+                    <button class="tab-btn active" onclick="showTab('pending')">Pending Needs</button>
+                    <button class="tab-btn" onclick="showTab('approved')">Approved Needs</button>
+                    <button class="tab-btn" onclick="showTab('schools')">School Management</button>
+                </div>
+                <div id="pendingTab" class="tab-content active">
+                    <h3>Pending Verification</h3>
+                    <div id="pendingNeeds" class="needs-list">
+                        <!-- Pending needs will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div id="approvedTab" class="tab-content">
+                    <h3>Approved Needs</h3>
+                    <div id="approvedNeeds" class="needs-list">
+                        <!-- Approved needs will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div id="schoolsTab" class="tab-content">
+                    <h3>School Management</h3>
+                    <div id="schoolsList" class="schools-list">
+                        <!-- Schools list will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donation Modal -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Make a Donation</h2>
+            <div id="modalBody">
+                <!-- Modal content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>EquiLearn</h3>
+                    <p>Connecting schools with donors to create educational opportunities.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#schools">Schools</a></li>
+                        <li><a href="#donate">Donate</a></li>
+                        <li><a href="#impact">Impact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@equilearn.org</p>
+                    <p>Phone: (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 EquiLearn. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
