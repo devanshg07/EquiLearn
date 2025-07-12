@@ -10,7 +10,7 @@ load_dotenv()
 import openai
 import re
 import json
-from models import User, School, Need, Donation, FeaturedSchool
+from models import User, School, Need, Donation, FeaturedSchool, FeaturedSchoolDonation
 from extensions import db, login_manager
 from flask_migrate import Migrate
 import random
@@ -376,11 +376,21 @@ def donate_to_featured_school():
     if school.current_funding is None:
         school.current_funding = 0
     school.current_funding += amount
+    # Record the donation if user is logged in
+    user_id = None
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        db.session.add(FeaturedSchoolDonation(user_id=user_id, school_id=school_id, amount=amount))
     db.session.commit()
+    # Calculate user's total donated to featured schools
+    total_donated = 0
+    if user_id:
+        total_donated = db.session.query(db.func.sum(FeaturedSchoolDonation.amount)).filter_by(user_id=user_id).scalar() or 0
     return jsonify({
         'school_id': school.id,
         'currentFunding': school.current_funding,
-        'fundingGoal': school.funding_goal
+        'fundingGoal': school.funding_goal,
+        'userTotalDonated': total_donated
     })
 
 # Authentication routes

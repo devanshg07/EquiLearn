@@ -5,9 +5,10 @@ import './Dashboard.css';
 
 interface DonorDashboardProps {
   user: User;
+  onUserTotalDonatedChange?: (total: number) => void;
 }
 
-const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
+const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonatedChange }) => {
   const userDonations = mockDonations.filter(d => d.donorName === user.name);
   const totalDonated = userDonations.reduce((sum, d) => sum + d.amount, 0);
 
@@ -36,6 +37,9 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user }) => {
           i === idx ? { ...s, currentFunding: data.currentFunding } : s
         ));
         setDonationAmounts(a => ({ ...a, [schoolId]: 0 }));
+        if (data.userTotalDonated !== undefined && onUserTotalDonatedChange) {
+          onUserTotalDonatedChange(data.userTotalDonated);
+        }
       }
     } catch (e) {}
     setDonationLoading(l => ({ ...l, [schoolId]: false }));

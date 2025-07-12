@@ -41,7 +41,17 @@ function App() {
               path="/dashboard" 
               element={
                 currentUser?.role === 'donor' ? 
-                <DonorDashboard user={currentUser} /> : 
+                <DonorDashboard 
+                  user={currentUser} 
+                  onUserTotalDonatedChange={(total) => {
+                    setCurrentUser(u => {
+                      if (!u) return u;
+                      const updated = { ...u, totalDonated: total };
+                      localStorage.setItem('currentUser', JSON.stringify(updated));
+                      return updated;
+                    });
+                  }}
+                /> : 
                 <Home />
               } 
             />

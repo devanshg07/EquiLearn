@@ -56,3 +56,10 @@ class FeaturedSchool(db.Model):
     needs = db.Column(db.Text, nullable=True)  # Store as JSON string 
     funding_goal = db.Column(db.Float, nullable=True)
     current_funding = db.Column(db.Float, nullable=True) 
+
+class FeaturedSchoolDonation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    school_id = db.Column(db.Integer, db.ForeignKey('featured_school.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow) 
