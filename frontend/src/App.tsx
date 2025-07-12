@@ -7,7 +7,6 @@ import DonorDashboard from './pages/DonorDashboard';
 import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import ClipboardDemo from './components/ClipboardDemo';
 import { User } from './types';
 import './App.css';
 
@@ -26,7 +25,6 @@ function App() {
     <Router>
       <div className="App">
         <Navbar currentUser={currentUser} onLogout={handleLogout} />
-        <ClipboardDemo />
         <main>
           <Routes>
             <Route path="/" element={<Home />} />

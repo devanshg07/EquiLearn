@@ -1,6 +1,7 @@
+/* Modern Schools Page Styles */
 .schools-page {
   padding: 3rem 0;
-  background: #f8f9fa;
+  background: #f4f6fb;
   min-height: 100vh;
 }
 
@@ -18,12 +19,13 @@
 }
 
 .search-box input {
-  padding: 0.75rem 1.2rem;
+  padding: 0.85rem 1.5rem;
   border-radius: 25px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  width: 250px;
-  transition: border-color 0.3s;
+  border: 1.5px solid #e0e6f7;
+  font-size: 1.1rem;
+  width: 260px;
+  background: #fff;
+  transition: border-color 0.2s;
 }
 
 .search-box input:focus {
@@ -32,12 +34,12 @@
 }
 
 .category-filter select {
-  padding: 0.75rem 1.2rem;
+  padding: 0.85rem 1.5rem;
   border-radius: 25px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  background: white;
-  transition: border-color 0.3s;
+  border: 1.5px solid #e0e6f7;
+  font-size: 1.1rem;
+  background: #fff;
+  transition: border-color 0.2s;
 }
 
 .category-filter select:focus {
@@ -47,22 +49,23 @@
 
 .schools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 2rem;
 }
 
 .school-card {
-  background: white;
+  background: #fff;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
+  box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
+  transition: box-shadow 0.2s, transform 0.2s;
   display: flex;
   flex-direction: column;
 }
 
 .school-card:hover {
-  transform: translateY(-5px);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.18);
+  transform: translateY(-2px) scale(1.01);
 }
 
 .school-image {
@@ -81,13 +84,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 5px;
   background-color: rgba(255, 255, 255, 0.3);
 }
 
 .progress-bar {
   height: 100%;
-  background-color: #28a745;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   transition: width 0.3s;
 }
 
@@ -102,13 +105,14 @@
 .school-content h3 {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: #222;
+  font-weight: 700;
 }
 
 .school-location {
   color: #666;
   margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .school-description {
@@ -119,20 +123,20 @@
 
 .school-needs {
   margin-bottom: 0.7rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #666;
 }
 
 .school-funding {
   margin-bottom: 1rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #28a745;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .funding-percentage {
   color: #888;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .no-results {
@@ -145,7 +149,7 @@
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.18);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -153,13 +157,19 @@
 }
 
 .modal {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(102,126,234,0.18);
   max-width: 450px;
   width: 100%;
-  padding: 2rem;
+  padding: 2.2rem 1.5rem;
   position: relative;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-header {
@@ -202,7 +212,7 @@
   margin-top: 1rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .schools-grid {
     grid-template-columns: 1fr;
   }

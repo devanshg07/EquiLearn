@@ -18,9 +18,7 @@ const Home: React.FC = () => {
             <Link to="/register" className="btn btn-secondary">Become a Donor</Link>
           </div>
         </div>
-        <div className="hero-image">
-          <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9e1?w=600" alt="Students learning" />
-        </div>
+        {/* Removed hero-image */}
       </section>
 
       {/* Impact Stats */}
