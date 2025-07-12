@@ -81,15 +81,7 @@ def load_user(user_id):
 
 # Routes
 @app.route('/')
-def landing():
-    return render_template('landing.html')
-
-@app.route('/home')
-@login_required
 def index():
-    # Only allow donors and admins to see the main page
-    if current_user.role not in ['donor', 'admin']:
-        return redirect(url_for('login'))
     return render_template('index.html')
 
 @app.route('/api/schools', methods=['GET'])
