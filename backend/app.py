@@ -81,7 +81,15 @@ def load_user(user_id):
 
 # Routes
 @app.route('/')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/home')
+@login_required
 def index():
+    # Only allow donors and admins to see the main page
+    if current_user.role not in ['donor', 'admin']:
+        return redirect(url_for('login'))
     return render_template('index.html')
 
 @app.route('/api/schools', methods=['GET'])
@@ -361,25 +369,59 @@ def register():
     
     return render_template('register.html')
 
+@app.route('/register/donor', methods=['GET', 'POST'])
+def register_donor():
+    if request.method == 'POST':
+        data = request.get_json()
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({'error': 'Email already registered'}), 400
+        user = User(
+            email=data['email'],
+            password_hash=generate_password_hash(data['password']),
+            name=data['name'],
+            role='donor'
+        )
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'message': 'Registration successful'}), 201
+    return render_template('register_donor.html')
+
+@app.route('/register/admin', methods=['GET', 'POST'])
+def register_admin():
+    if request.method == 'POST':
+        data = request.get_json()
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({'error': 'Email already registered'}), 400
+        user = User(
+            email=data['email'],
+            password_hash=generate_password_hash(data['password']),
+            name=data['name'],
+            role='admin'
+        )
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'message': 'Registration successful'}), 201
+    return render_template('register_admin.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         data = request.get_json()
         user = User.query.filter_by(email=data['email']).first()
-        
         if user and check_password_hash(user.password_hash, data['password']):
             login_user(user)
             return jsonify({'message': 'Login successful'})
-        
         return jsonify({'error': 'Invalid credentials'}), 401
-    
+    # If already logged in, redirect to main page
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     return render_template('login.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 # Initialize database
 def init_db():
