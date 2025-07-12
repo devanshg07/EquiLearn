@@ -82,7 +82,7 @@ def load_user(user_id):
 # Routes
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return "EquiLearn Flask backend is running."
 
 @app.route('/api/schools', methods=['GET'])
 def get_schools():

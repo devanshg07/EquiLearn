@@ -1,18 +1,40 @@
-import React, { useState } from 'react';
-import { mockSchools } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
+// import { mockSchools } from '../data/mockData';
 import { School } from '../types';
 import './Schools.css';
 
 const Schools: React.FC = () => {
+  const [schools, setSchools] = useState<School[]>([]);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [donationAmount, setDonationAmount] = useState<string>('');
   const [donationMessage, setDonationMessage] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const categories = ['all', ...Array.from(new Set(mockSchools.map(school => school.category)))];
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/schools')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch schools');
+        return res.json();
+      })
+      .then(data => {
+        // Map API data to School type if needed
+        setSchools(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
-  const filteredSchools = mockSchools.filter(school => {
+  // Build categories from API data
+  const categories = ['all', ...Array.from(new Set(schools.map(school => school.category).filter(Boolean)))] as string[];
+
+  const filteredSchools = schools.filter(school => {
     const matchesCategory = filterCategory === 'all' || school.category === filterCategory;
     const matchesSearch = school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          school.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -61,16 +83,20 @@ const Schools: React.FC = () => {
           </div>
         </div>
 
+        {/* Loading/Error States */}
+        {loading && <div>Loading schools...</div>}
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+
         {/* Schools Grid */}
         <div className="schools-grid">
           {filteredSchools.map((school) => (
             <div key={school.id} className="school-card">
               <div className="school-image">
-                <img src={school.imageUrl} alt={school.name} />
+                <img src={school.imageUrl || ''} alt={school.name} />
                 <div className="funding-progress">
                   <div 
                     className="progress-bar" 
-                    style={{ width: `${(school.currentFunding / school.fundingGoal) * 100}%` }}
+                    style={{ width: `${(school.currentFunding / school.fundingGoal) * 100 || 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -79,12 +105,12 @@ const Schools: React.FC = () => {
                 <p className="school-location">{school.location}</p>
                 <p className="school-description">{school.description}</p>
                 <div className="school-needs">
-                  <strong>Needs:</strong> {school.needs.join(', ')}
+                  <strong>Needs:</strong> {Array.isArray(school.needs) ? school.needs.join(', ') : ''}
                 </div>
                 <div className="school-funding">
-                  <span>${school.currentFunding.toLocaleString()} raised of ${school.fundingGoal.toLocaleString()}</span>
+                  <span>${school.currentFunding?.toLocaleString?.() || 0} raised of ${school.fundingGoal?.toLocaleString?.() || 0}</span>
                   <div className="funding-percentage">
-                    {Math.round((school.currentFunding / school.fundingGoal) * 100)}% funded
+                    {school.fundingGoal ? Math.round((school.currentFunding / school.fundingGoal) * 100) : 0}% funded
                   </div>
                 </div>
                 <button 
@@ -98,7 +124,7 @@ const Schools: React.FC = () => {
           ))}
         </div>
 
-        {filteredSchools.length === 0 && (
+        {filteredSchools.length === 0 && !loading && !error && (
           <div className="no-results">
             <p>No schools found matching your criteria.</p>
           </div>
@@ -120,7 +146,7 @@ const Schools: React.FC = () => {
             </div>
             <div className="modal-content">
               <div className="school-info">
-                <img src={selectedSchool.imageUrl} alt={selectedSchool.name} />
+                <img src={selectedSchool.imageUrl || ''} alt={selectedSchool.name} />
                 <div>
                   <h3>{selectedSchool.name}</h3>
                   <p>{selectedSchool.location}</p>
