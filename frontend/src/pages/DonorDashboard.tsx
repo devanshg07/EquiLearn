@@ -11,7 +11,6 @@ interface DonorDashboardProps {
 const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonatedChange }) => {
   // Remove mockDonations usage for impact
   const [userDonations, setUserDonations] = useState<any[]>([]);
-  const [totalDonated, setTotalDonated] = useState(0);
   const [donationsLoading, setDonationsLoading] = useState(false);
 
   // Featured schools state
@@ -28,33 +27,61 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
   const [joiningPool, setJoiningPool] = useState<{ [key: number]: boolean }>({});
 
   const [mockPools, setMockPools] = useState(mockMicroDonationPools);
+  const [mockSchools, setMockSchools] = useState([
+    {
+      id: 1,
+      name: "John Fraser Secondary School",
+      location: "2665 Erin Centre Blvd, Mississauga, ON L5M 5H6",
+      description: "John Fraser Secondary School is a public high school in Mississauga with a focus on academic excellence and extracurricular activities.",
+      needs: ["new textbooks", "upgraded technology", "sports equipment"],
+      fundingGoal: 10000,
+      currentFunding: 300
+    },
+    {
+      id: 2,
+      name: "St. Marcellinus Secondary School",
+      location: "730 Courtneypark Dr W, Mississauga, ON L5W 1L9",
+      description: "St. Marcellinus Secondary School is a Catholic high school known for its strong arts and sports programs.",
+      needs: ["musical instruments", "art supplies", "sports uniforms"],
+      fundingGoal: 8000,
+      currentFunding: 210
+    },
+    {
+      id: 3,
+      name: "Barondale Public School",
+      location: "200 Barondale Dr, Mississauga, ON L4Z 3N7",
+      description: "Barondale Public School is an elementary school in Mississauga that prides itself on fostering a supportive and inclusive learning environment.",
+      needs: ["educational games", "classroom supplies", "updated library books"],
+      fundingGoal: 5000,
+      currentFunding: 0
+    }
+  ]);
 
-  const handleDonate = async (schoolId: number, idx: number) => {
-    const amount = donationAmounts[schoolId];
-    if (!amount || amount <= 0) return;
-    setDonationLoading(l => ({ ...l, [schoolId]: true }));
-    try {
-      const res = await fetch('/api/featured-schools/donate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ school_id: schoolId, amount })
-      });
-      const data = await res.json();
-      if (data.currentFunding !== undefined) {
-        setFeaturedSchools(schools => schools.map((s, i) =>
-          i === idx ? { ...s, currentFunding: data.currentFunding } : s
-        ));
-        setDonationAmounts(a => ({ ...a, [schoolId]: 0 }));
-        fetchUserDonations(); // Refresh donations after donating
-        if (data.userTotalDonated !== undefined && onUserTotalDonatedChange) {
-          onUserTotalDonatedChange(data.userTotalDonated);
-        }
-      }
-    } catch (e) {}
-    setDonationLoading(l => ({ ...l, [schoolId]: false }));
+  const [recentDonations, setRecentDonations] = useState<any[]>([]);
+
+  const handleMockSchoolDonate = (schoolId: number, amount: number) => {
+    setMockSchools(schools =>
+      schools.map(s =>
+        s.id === schoolId
+          ? { ...s, currentFunding: s.currentFunding + amount }
+          : s
+      )
+    );
+    setDonationAmounts(a => ({ ...a, [schoolId]: 0 }));
+    const school = mockSchools.find(s => s.id === schoolId);
+    setRecentDonations(donations => [
+      {
+        id: Date.now() + Math.random(),
+        name: school?.name || 'School',
+        type: 'School',
+        amount,
+        date: new Date().toISOString()
+      },
+      ...donations
+    ]);
   };
 
-  const handleJoinPool = async (poolId: number, idx: number, amount?: number) => {
+  const handleJoinPool = (poolId: number, idx: number, amount?: number) => {
     setJoiningPool(j => ({ ...j, [poolId]: true }));
     setTimeout(() => { // Simulate async
       setMockPools(pools => pools.map((p, i) =>
@@ -68,6 +95,17 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
       ));
       setPoolAmounts(a => ({ ...a, [poolId]: 0 }));
       setJoiningPool(j => ({ ...j, [poolId]: false }));
+      const pool = mockPools.find(p => p.id === poolId);
+      setRecentDonations(donations => [
+        {
+          id: Date.now() + Math.random(),
+          name: pool?.name || 'Pool',
+          type: 'Pool',
+          amount: amount || 0,
+          date: new Date().toISOString()
+        },
+        ...donations
+      ]);
     }, 600);
   };
 
@@ -79,7 +117,7 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
       .then(data => {
         if (Array.isArray(data)) {
           setUserDonations(data);
-          setTotalDonated(data.reduce((sum, d) => sum + d.amount, 0));
+          // setTotalDonated(data.reduce((sum, d) => sum + d.amount, 0)); // Removed
           if (onUserTotalDonatedChange) onUserTotalDonatedChange(data.reduce((sum, d) => sum + d.amount, 0));
         }
         setDonationsLoading(false);
@@ -110,6 +148,11 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
   // Remove microPools, loadingPools, errorPools, and related useEffect
   // Use mockMicroDonationPools as before
 
+  // Calculate impact stats from recentDonations
+  const totalDonated = recentDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
+  const donationsMade = recentDonations.length;
+  const schoolsSupported = new Set(recentDonations.filter(d => d.type === 'School').map(d => d.name)).size;
+
   return (
     <div className="dashboard">
       <div className="container">
@@ -128,11 +171,11 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
                 <div className="stat-label">Total Donated</div>
               </div>
               <div className="impact-stat">
-                <div className="stat-number">{userDonations.length}</div>
+                <div className="stat-number">{donationsMade}</div>
                 <div className="stat-label">Donations Made</div>
               </div>
               <div className="impact-stat">
-                <div className="stat-number">{new Set(userDonations.map(d => d.school_name || d.schoolName)).size}</div>
+                <div className="stat-number">{schoolsSupported}</div>
                 <div className="stat-label">Schools Supported</div>
               </div>
             </div>
@@ -142,28 +185,15 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
         {/* Featured Schools (only after login) */}
         <div className="dashboard-section">
           <h2>Schools Near You</h2>
-          {loadingSchools && <div>Loading schools...</div>}
-          {errorSchools && <div style={{ color: 'red' }}>{errorSchools}</div>}
-          {(!loadingSchools && featuredSchools.length === 0) && (
-            <div>No schools found for your city.</div>
-          )}
           <div className="schools-grid">
-            {Array.isArray(featuredSchools) && featuredSchools.map((school, idx) => {
+            {mockSchools.map((school) => {
               const percent = school.fundingGoal && school.currentFunding ? Math.round((school.currentFunding / school.fundingGoal) * 100) : 0;
-              // Fix needs display
               let needsList: string[] = [];
               if (Array.isArray(school.needs)) {
-                needsList = school.needs.map((need: any) => {
-                  if (typeof need === 'string') return need;
-                  if (typeof need === 'object' && need !== null) {
-                    // Try to get a string property
-                    return need.title || need.name || Object.values(need).find(v => typeof v === 'string') || JSON.stringify(need);
-                  }
-                  return String(need);
-                });
+                needsList = school.needs.map((need: any) => String(need));
               }
               return (
-                <div key={school.name + idx} className="school-card">
+                <div key={school.id} className="school-card">
                   <div className="school-content">
                     <h3>{school.name}</h3>
                     <p className="school-location">{school.location}</p>
@@ -197,10 +227,10 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
                       />
                       <button
                         className="btn btn-primary"
-                        disabled={donationLoading[school.id] || !donationAmounts[school.id] || donationAmounts[school.id] <= 0}
-                        onClick={() => handleDonate(school.id, idx)}
+                        disabled={!donationAmounts[school.id] || donationAmounts[school.id] <= 0}
+                        onClick={() => handleMockSchoolDonate(school.id, donationAmounts[school.id])}
                       >
-                        {donationLoading[school.id] ? 'Donating...' : 'Donate'}
+                        Donate
                       </button>
                     </div>
                   </div>
@@ -214,21 +244,21 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
         <div className="dashboard-section">
           <h2>Recent Donations</h2>
           <div className="donations-list">
-            {userDonations.slice(0, 5).map((donation) => (
+            {recentDonations.slice(0, 5).map((donation) => (
               <div key={donation.id} className="donation-item">
                 <div className="donation-info">
-                  <h4>{donation.school_name || donation.schoolName}</h4>
+                  <h4>{donation.name}</h4>
+                  <span className="donation-type">
+                    {donation.type === 'School' ? 'School Donation' : 'Pool Donation'}
+                  </span>
                   <p className="donation-date">{new Date(donation.date).toLocaleDateString()}</p>
-                  {donation.message && (
-                    <p className="donation-message">"{donation.message}"</p>
-                  )}
                 </div>
-                <div className="donation-amount">
+                <div className="donation-amount" style={{ color: 'green', fontWeight: 600, fontSize: '1.2em' }}>
                   ${donation.amount.toLocaleString()}
                 </div>
               </div>
             ))}
-            {userDonations.length === 0 && (
+            {recentDonations.length === 0 && (
               <p className="no-donations">You haven't made any donations yet. <a href="/schools">Browse schools</a> to get started!</p>
             )}
           </div>
