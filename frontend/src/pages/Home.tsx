@@ -177,9 +177,9 @@ const Home: React.FC = () => {
       </section>
 
       {/* Impact Stats (refactored to match How It Works) */}
-      <section style={{ background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
+      <section style={{ background: '#e9ecef', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
-          <h2 className="how-it-works-title" style={{ color: '#7faaff', textAlign: 'center' }}>Our Impact</h2>
+          <h2 className="how-it-works-title" style={{ color: '#111', textAlign: 'center' }}>Our Impact</h2>
           {loading && <div>Loading impact stats...</div>}
           {error && <div style={{ color: 'red' }}>{error}</div>}
           <div className="steps-grid">
@@ -219,7 +219,7 @@ const Home: React.FC = () => {
       {/* (Removed: Only show after login) */}
 
       {/* How It Works */}
-      <section style={{ background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
+      <section style={{ background: '#e9ecef', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
           <h2 className="how-it-works-title" style={{ color: '#111', textAlign: 'center' }}>How It Works</h2>
           <div className="steps-grid">
@@ -243,9 +243,9 @@ const Home: React.FC = () => {
       </section>
 
       {/* Supporting Companies Marquee */}
-      <section style={{ background: 'linear-gradient(90deg, #e0e7ff 0%, #fff 100%)', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
+      <section style={{ background: '#e9ecef', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
-          <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Companies Supporting Education Funding</h2>
+          <h2 style={{ color: '#7faaff', textAlign: 'center', marginBottom: 24, fontSize: '2.1rem', fontWeight: 900 }}>Companies Supporting Education Funding</h2>
           <div className="companies-marquee" style={{ overflow: 'hidden', width: '100%' }}>
             <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 18s linear infinite', animationDelay: '4s' }}>
               {(() => {
@@ -260,7 +260,7 @@ const Home: React.FC = () => {
                 ].filter(company => !hiddenCompanies.includes(company.name));
                 const loopCompanies = [...companies, ...companies];
                 return loopCompanies.map((company, idx) => (
-                  <span key={company.name + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 32px', minWidth: 60 }}>
+                  <span key={company.name + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 32px', minWidth: 60, color: '#7faaff' }}>
                     <img 
                       src={company.logo} 
                       alt={company.name} 
@@ -276,9 +276,9 @@ const Home: React.FC = () => {
       </section>
 
       {/* Supporting People Marquee */}
-      <section style={{ background: 'linear-gradient(90deg, #e0e7ff 0%, #fff 100%)', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
+      <section style={{ background: '#e9ecef', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
-          <h2 style={{ textAlign: 'center', marginBottom: 24 }}>People Supporting Education Funding</h2>
+          <h2 style={{ color: '#7faaff', textAlign: 'center', marginBottom: 24, fontSize: '2.1rem', fontWeight: 900 }}>People Supporting Education Funding</h2>
           <div className="people-marquee" style={{ overflow: 'hidden', width: '100%' }}>
             <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 18s linear infinite', animationDelay: '4s' }}>
               {(() => {
@@ -291,7 +291,7 @@ const Home: React.FC = () => {
                 ];
                 const loopPeople = [...people, ...people];
                 return loopPeople.map((person, idx) => (
-                  <span key={person + idx} style={{ display: 'inline-flex', alignItems: 'center', margin: '0 32px', fontWeight: 600, fontSize: 22, color: '#333' }}>
+                  <span key={person + idx} style={{ display: 'inline-flex', alignItems: 'center', margin: '0 32px', fontWeight: 600, fontSize: 22, color: '#7faaff' }}>
                     {person}
                   </span>
                 ));

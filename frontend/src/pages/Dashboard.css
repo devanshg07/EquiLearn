@@ -1,3 +1,7 @@
+.dashboard, .dashboard * {
+  color: #111 !important;
+}
+
 .dashboard {
   padding: 3rem 0;
   background: #f8f9fa;

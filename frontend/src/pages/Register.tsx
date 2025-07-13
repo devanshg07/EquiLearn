@@ -162,7 +162,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 required
                 placeholder="Enter your city"
               />
-              <button type="button" className="btn btn-secondary" style={{ marginTop: 8 }} onClick={handleUseLocation}>
+              <button type="button" className="btn btn-primary" style={{ marginTop: 8 }} onClick={handleUseLocation}>
                 Use my location
               </button>
               {/* Hidden fields for coordinates */}
@@ -175,9 +175,6 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
             </button>
           </form>
           
-          <div className="auth-footer">
-            <p>Already have an account? <Link to="/login">Sign in</Link></p>
-          </div>
         </div>
       </div>
     </div>

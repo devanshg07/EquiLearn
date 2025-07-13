@@ -68,10 +68,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </button>
           </form>
           
-          <div className="auth-footer">
-            <p>Don't have an account? <Link to="/register">Sign up</Link></p>
-          </div>
-          
           <div className="demo-accounts">
             <h4>Demo Accounts:</h4>
             <div className="demo-account">
