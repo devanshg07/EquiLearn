@@ -10,7 +10,7 @@ load_dotenv()
 import openai
 import re
 import json
-from models import User, School, Need, Donation, FeaturedSchool, FeaturedSchoolDonation
+from models import User, School, Need, Donation, FeaturedSchool, FeaturedSchoolDonation, MicroDonationPool
 from extensions import db, login_manager
 from flask_migrate import Migrate
 import random
@@ -446,6 +446,38 @@ def donate_to_featured_school():
         'userTotalDonated': total_donated
     })
 
+@app.route('/api/micro-pools', methods=['GET'])
+def get_micro_pools():
+    pools = MicroDonationPool.query.all()
+    return jsonify([
+        {
+            'id': p.id,
+            'name': p.name,
+            'description': p.description,
+            'targetAmount': p.target_amount,
+            'currentAmount': p.current_amount,
+            'participants': p.participants,
+            'endDate': p.end_date.strftime('%Y-%m-%d')
+        } for p in pools
+    ])
+
+@app.route('/api/micro-pools/join', methods=['POST'])
+@login_required
+def join_micro_pool():
+    data = request.get_json()
+    pool_id = data.get('pool_id')
+    amount = data.get('amount', 0)
+    pool = MicroDonationPool.query.get(pool_id)
+    if not pool:
+        return jsonify({'error': 'Pool not found'}), 404
+    pool.current_amount += amount
+    pool.participants += 1
+    from models import MicroDonationPoolJoin
+    join = MicroDonationPoolJoin(user_id=current_user.id, pool_id=pool_id, amount=amount)
+    db.session.add(join)
+    db.session.commit()
+    return jsonify({'message': 'Donated to pool successfully', 'currentAmount': pool.current_amount, 'participants': pool.participants})
+
 # Authentication routes
 @app.route('/register/donor', methods=['GET', 'POST'])
 def register_donor():
@@ -549,6 +581,39 @@ def init_db():
             for need in sample_needs:
                 db.session.add(need)
             
+            db.session.commit()
+        
+        # Add sample micro donation pools if none exist
+        if MicroDonationPool.query.count() == 0:
+            from datetime import datetime
+            pools = [
+                MicroDonationPool(
+                    name='Back to School Supplies',
+                    description='Help provide essential school supplies for students in need across multiple schools.',
+                    target_amount=10000,
+                    current_amount=6500,
+                    participants=127,
+                    end_date=datetime(2024, 2, 14)
+                ),
+                MicroDonationPool(
+                    name='Technology for All',
+                    description='Fund computers and tablets for schools that lack basic technology infrastructure.',
+                    target_amount=25000,
+                    current_amount=18200,
+                    participants=89,
+                    end_date=datetime(2024, 2, 29)
+                ),
+                MicroDonationPool(
+                    name='Sports Equipment Drive',
+                    description='Provide sports equipment and uniforms for schools to promote physical education.',
+                    target_amount=8000,
+                    current_amount=4200,
+                    participants=156,
+                    end_date=datetime(2024, 2, 27)
+                ),
+            ]
+            for pool in pools:
+                db.session.add(pool)
             db.session.commit()
         
         print("Database initialized successfully!")

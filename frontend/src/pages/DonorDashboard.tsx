@@ -23,6 +23,12 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
   const [donationAmounts, setDonationAmounts] = useState<{ [key: number]: number }>({});
   const [donationLoading, setDonationLoading] = useState<{ [key: number]: boolean }>({});
 
+  const [poolAmounts, setPoolAmounts] = useState<{ [key: number]: number }>({});
+
+  const [joiningPool, setJoiningPool] = useState<{ [key: number]: boolean }>({});
+
+  const [mockPools, setMockPools] = useState(mockMicroDonationPools);
+
   const handleDonate = async (schoolId: number, idx: number) => {
     const amount = donationAmounts[schoolId];
     if (!amount || amount <= 0) return;
@@ -46,6 +52,23 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
       }
     } catch (e) {}
     setDonationLoading(l => ({ ...l, [schoolId]: false }));
+  };
+
+  const handleJoinPool = async (poolId: number, idx: number, amount?: number) => {
+    setJoiningPool(j => ({ ...j, [poolId]: true }));
+    setTimeout(() => { // Simulate async
+      setMockPools(pools => pools.map((p, i) =>
+        p.id === poolId
+          ? {
+              ...p,
+              currentAmount: p.currentAmount + (amount || 0),
+              participants: p.participants + 1
+            }
+          : p
+      ));
+      setPoolAmounts(a => ({ ...a, [poolId]: 0 }));
+      setJoiningPool(j => ({ ...j, [poolId]: false }));
+    }, 600);
   };
 
   // Fetch real donations on mount and after donation
@@ -83,6 +106,9 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
         setLoadingSchools(false);
       });
   }, [user.city]);
+
+  // Remove microPools, loadingPools, errorPools, and related useEffect
+  // Use mockMicroDonationPools as before
 
   return (
     <div className="dashboard">
@@ -212,7 +238,7 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
         <div className="dashboard-section">
           <h2>Micro Donation Pools</h2>
           <div className="pools-grid">
-            {mockMicroDonationPools.map((pool) => (
+            {mockPools.map((pool, idx) => (
               <div key={pool.id} className="pool-card">
                 <h3>{pool.name}</h3>
                 <p>{pool.description}</p>
@@ -231,7 +257,23 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
                 <div className="pool-deadline">
                   Ends: {new Date(pool.endDate).toLocaleDateString()}
                 </div>
-                <button className="btn btn-primary">Join Pool</button>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                  <input
+                    type="number"
+                    min={1}
+                    placeholder="Amount"
+                    value={poolAmounts[pool.id] || ''}
+                    onChange={e => setPoolAmounts(a => ({ ...a, [pool.id]: Number(e.target.value) }))}
+                    style={{ width: 80 }}
+                  />
+                  <button
+                    className="btn btn-primary"
+                    disabled={joiningPool[pool.id] || !poolAmounts[pool.id] || poolAmounts[pool.id] <= 0}
+                    onClick={() => handleJoinPool(pool.id, idx, poolAmounts[pool.id])}
+                  >
+                    {joiningPool[pool.id] ? 'Donating...' : 'Donate'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

@@ -83,27 +83,27 @@ export const mockMicroDonationPools: MicroDonationPool[] = [
     id: 1,
     name: "Back to School Supplies",
     description: "Help provide essential school supplies for students in need across multiple schools.",
-    targetAmount: 10000,
-    currentAmount: 6500,
-    participants: 127,
-    endDate: "2024-02-15"
+    targetAmount: 15000,
+    currentAmount: 7200,
+    participants: 143,
+    endDate: "2024-08-15"
   },
   {
     id: 2,
     name: "Technology for All",
     description: "Fund computers and tablets for schools that lack basic technology infrastructure.",
-    targetAmount: 25000,
-    currentAmount: 18200,
-    participants: 89,
-    endDate: "2024-03-01"
+    targetAmount: 30000,
+    currentAmount: 19500,
+    participants: 102,
+    endDate: "2024-09-01"
   },
   {
     id: 3,
     name: "Sports Equipment Drive",
     description: "Provide sports equipment and uniforms for schools to promote physical education.",
-    targetAmount: 8000,
-    currentAmount: 4200,
-    participants: 156,
-    endDate: "2024-02-28"
+    targetAmount: 12000,
+    currentAmount: 5100,
+    participants: 178,
+    endDate: "2024-08-28"
   }
 ]; 
