@@ -9,8 +9,10 @@ interface DonorDashboardProps {
 }
 
 const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonatedChange }) => {
-  const userDonations = mockDonations.filter(d => d.donorName === user.name);
-  const totalDonated = userDonations.reduce((sum, d) => sum + d.amount, 0);
+  // Remove mockDonations usage for impact
+  const [userDonations, setUserDonations] = useState<any[]>([]);
+  const [totalDonated, setTotalDonated] = useState(0);
+  const [donationsLoading, setDonationsLoading] = useState(false);
 
   // Featured schools state
   const [featuredSchools, setFeaturedSchools] = useState<any[]>([]);
@@ -37,6 +39,7 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
           i === idx ? { ...s, currentFunding: data.currentFunding } : s
         ));
         setDonationAmounts(a => ({ ...a, [schoolId]: 0 }));
+        fetchUserDonations(); // Refresh donations after donating
         if (data.userTotalDonated !== undefined && onUserTotalDonatedChange) {
           onUserTotalDonatedChange(data.userTotalDonated);
         }
@@ -44,6 +47,27 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
     } catch (e) {}
     setDonationLoading(l => ({ ...l, [schoolId]: false }));
   };
+
+  // Fetch real donations on mount and after donation
+  const fetchUserDonations = () => {
+    setDonationsLoading(true);
+    fetch('/api/donations', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setUserDonations(data);
+          setTotalDonated(data.reduce((sum, d) => sum + d.amount, 0));
+          if (onUserTotalDonatedChange) onUserTotalDonatedChange(data.reduce((sum, d) => sum + d.amount, 0));
+        }
+        setDonationsLoading(false);
+      })
+      .catch(() => setDonationsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchUserDonations();
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (!user.city) return;
@@ -82,7 +106,7 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
                 <div className="stat-label">Donations Made</div>
               </div>
               <div className="impact-stat">
-                <div className="stat-number">{new Set(userDonations.map(d => d.schoolId)).size}</div>
+                <div className="stat-number">{new Set(userDonations.map(d => d.school_name || d.schoolName)).size}</div>
                 <div className="stat-label">Schools Supported</div>
               </div>
             </div>
@@ -167,7 +191,7 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
             {userDonations.slice(0, 5).map((donation) => (
               <div key={donation.id} className="donation-item">
                 <div className="donation-info">
-                  <h4>{donation.schoolName}</h4>
+                  <h4>{donation.school_name || donation.schoolName}</h4>
                   <p className="donation-date">{new Date(donation.date).toLocaleDateString()}</p>
                   {donation.message && (
                     <p className="donation-message">"{donation.message}"</p>
