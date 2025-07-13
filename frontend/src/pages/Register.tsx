@@ -1,78 +1,107 @@
+// Register.tsx - Registration page for new donors/admins in EquiLearn
+// Handles registration form, validation, and auto-login after signup.
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { User } from '../types';
-import './Auth.css';
 
 interface RegisterProps {
-  onRegister: (user: User) => void;
+  onLogin: (user: User) => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ onRegister }) => {
+const Register: React.FC<RegisterProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'donor' as 'donor' | 'admin',
-    city: '',
-    latitude: '',
-    longitude: ''
+    city: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUseLocation = async () => {
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const { latitude, longitude } = position.coords;
-      // Use a free reverse geocoding API (e.g., OpenStreetMap Nominatim)
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-        const data = await res.json();
-        const city = data.address.city || data.address.town || data.address.village || data.address.state || '';
-        setFormData(f => ({ ...f, city, latitude: latitude.toString(), longitude: longitude.toString() }));
-      } catch {
-        setError('Could not determine your city from location');
-      }
-    }, () => setError('Could not get your location'));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
+    setSuccess('');
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword || !formData.city) {
+      setError('Please fill in all fields.');
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
-
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError('Password must be at least 6 characters.');
       return;
     }
-
-    // Mock registration
-    const newUser: User = {
-      id: Date.now(),
-      name: formData.name,
-      email: formData.email,
-      role: formData.role,
-      totalDonated: 0,
-      city: formData.city
-    };
-
-    onRegister(newUser);
-    navigate('/');
+    setLoading(true);
+    try {
+      const res = await fetch('/register/donor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          city: formData.city
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Registration failed.');
+      } else {
+        // Auto-login after successful registration
+        setSuccess('Registration successful! Logging you in...');
+        try {
+          const loginRes = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: formData.email,
+              password: formData.password
+            })
+          });
+          const loginData = await loginRes.json();
+          if (loginRes.ok) {
+            // Try to get user profile and store in localStorage
+            if (loginData && loginData.user) {
+              localStorage.setItem('currentUser', JSON.stringify(loginData.user));
+              console.log('Register auto-login user:', loginData.user); // DEBUG
+              onLogin(loginData.user); // Update App state
+            } else {
+              // Optionally, fetch user profile from /api/profile or /api/user
+              try {
+                const profileRes = await fetch('/api/profile', { credentials: 'include' });
+                if (profileRes.ok) {
+                  const profile = await profileRes.json();
+                  localStorage.setItem('currentUser', JSON.stringify(profile));
+                  console.log('Register fetched profile:', profile); // DEBUG
+                  onLogin(profile); // Update App state
+                }
+              } catch {}
+            }
+            navigate('/dashboard');
+          } else {
+            setSuccess('Registration successful! Please sign in.');
+            setTimeout(() => navigate('/login'), 1500);
+          }
+        } catch (e) {
+          setSuccess('Registration successful! Please sign in.');
+          setTimeout(() => navigate('/login'), 1500);
+        }
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,9 +110,8 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
         <div className="auth-card">
           <h2>Create Account</h2>
           <p>Join EquiLearn and make a difference</p>
-          
           {error && <div className="error-message">{error}</div>}
-          
+          {success && <div className="success-message">{success}</div>}
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
@@ -95,9 +123,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 onChange={handleChange}
                 required
                 placeholder="Enter your full name"
+                autoComplete="name"
               />
             </div>
-            
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -108,23 +136,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"
+                autoComplete="email"
               />
             </div>
-            
-            <div className="form-group">
-              <label htmlFor="role">Account Type</label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                required
-              >
-                <option value="donor">Donor</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-            
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
@@ -135,9 +149,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 onChange={handleChange}
                 required
                 placeholder="Enter your password"
+                autoComplete="new-password"
               />
             </div>
-            
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <input
@@ -148,11 +162,11 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 onChange={handleChange}
                 required
                 placeholder="Confirm your password"
+                autoComplete="new-password"
               />
             </div>
-            
             <div className="form-group">
-              <label htmlFor="city">City</label>
+              <label htmlFor="city">City / Location</label>
               <input
                 type="text"
                 id="city"
@@ -160,21 +174,14 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 value={formData.city}
                 onChange={handleChange}
                 required
-                placeholder="Enter your city"
+                placeholder="Enter your city or location"
+                autoComplete="address-level2"
               />
-              <button type="button" className="btn btn-primary" style={{ marginTop: 8 }} onClick={handleUseLocation}>
-                Use my location
-              </button>
-              {/* Hidden fields for coordinates */}
-              <input type="hidden" name="latitude" value={formData.latitude} />
-              <input type="hidden" name="longitude" value={formData.longitude} />
             </div>
-            
-            <button type="submit" className="btn btn-primary">
-              Create Account
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Registering...' : 'Create Account'}
             </button>
           </form>
-          
         </div>
       </div>
     </div>

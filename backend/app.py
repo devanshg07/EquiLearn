@@ -1,3 +1,7 @@
+"""
+app.py - Main Flask backend for EquiLearn
+Handles API routes for user registration, authentication, school and donation management, and admin features.
+"""
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -173,29 +177,7 @@ def create_donation():
 
 @app.route('/api/donations', methods=['GET'])
 def get_donations():
-    """Get donation history for current user"""
-    if not current_user.is_authenticated:
-        return jsonify({'error': 'Authentication required'}), 401
-    
-    donations = Donation.query.filter_by(donor_id=current_user.id).order_by(Donation.created_at.desc()).all()
-    
-    result = []
-    for donation in donations:
-        donation_data = {
-            'id': donation.id,
-            'amount': donation.amount,
-            'type': donation.donation_type,
-            'message': donation.message,
-            'date': donation.created_at.isoformat()
-        }
-        
-        if donation.need:
-            donation_data['need_title'] = donation.need.title
-            donation_data['school_name'] = donation.need.school.name
-        
-        result.append(donation_data)
-    
-    return jsonify(result)
+    return jsonify([])
 
 @app.route('/api/admin/needs/pending', methods=['GET'])
 @login_required
@@ -481,6 +463,7 @@ def join_micro_pool():
 # Authentication routes
 @app.route('/register/donor', methods=['GET', 'POST'])
 def register_donor():
+    """Register a new donor user via POST request."""
     if request.method == 'POST':
         data = request.get_json()
         if User.query.filter_by(email=data['email']).first():
@@ -522,7 +505,15 @@ def login():
             login_user(user)
             session.permanent = True
             app.permanent_session_lifetime = timedelta(days=30)
-            return jsonify({'message': 'Login successful'})
+            return jsonify({
+                'message': 'Login successful',
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'email': user.email,
+                    'role': user.role,
+                }
+            })
         return jsonify({'error': 'Invalid credentials'}), 401
     # If already logged in, redirect to main page
     if current_user.is_authenticated:

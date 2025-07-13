@@ -1,3 +1,5 @@
+// App.tsx - Main React app entry point for EquiLearn
+// Handles routing, user state, and global app logic.
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -32,6 +34,8 @@ function App() {
   const handleLogin = (user: User) => {
     setCurrentUser(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
+    setRecentDonations([]); // Clear donations for new user
+    localStorage.removeItem('recentDonations'); // Remove from storage
   };
 
   const handleLogout = () => {
@@ -84,7 +88,7 @@ function App() {
             />
             <Route 
               path="/register" 
-              element={<Register onRegister={handleLogin} />} 
+              element={<Register onLogin={handleLogin} />} 
             />
           </Routes>
         </main>

@@ -1,3 +1,5 @@
+// Login.tsx - Login page for EquiLearn
+// Handles user login form, validation, and authentication logic.
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from '../types';
@@ -67,6 +69,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               Sign In
             </button>
           </form>
+          <div style={{ textAlign: 'center', margin: '1.2rem 0 0.5rem 0' }}>
+            <span style={{ color: '#666', fontSize: '1rem' }}>Don't have an account? </span>
+            <a href="/register" style={{ color: '#7faaff', fontWeight: 600, textDecoration: 'none' }}>Create Account</a>
+          </div>
           
           <div className="demo-accounts">
             <h4>Demo Accounts:</h4>

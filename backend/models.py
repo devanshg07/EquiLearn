@@ -1,9 +1,14 @@
+"""
+models.py - SQLAlchemy models for EquiLearn
+Defines User, School, Need, Donation, and other database models.
+"""
 from datetime import datetime
 from flask_login import UserMixin
 from extensions import db
 from sqlalchemy.dialects.sqlite import JSON
 
 class User(UserMixin, db.Model):
+    """Database model for platform users (donors/admins)."""
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
@@ -13,6 +18,7 @@ class User(UserMixin, db.Model):
     donations = db.relationship('Donation', backref='donor', lazy=True)
 
 class School(db.Model):
+    """Database model for educational institutions (schools)."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     location = db.Column(db.String(50), nullable=False)
@@ -24,6 +30,7 @@ class School(db.Model):
     needs = db.relationship('Need', backref='school', lazy=True)
 
 class Need(db.Model):
+    """Database model for specific needs at schools."""
     id = db.Column(db.Integer, primary_key=True)
     school_id = db.Column(db.Integer, db.ForeignKey('school.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
@@ -38,6 +45,7 @@ class Need(db.Model):
     donations = db.relationship('Donation', backref='need', lazy=True)
 
 class Donation(db.Model):
+    """Database model for individual donations made by users."""
     id = db.Column(db.Integer, primary_key=True)
     donor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     need_id = db.Column(db.Integer, db.ForeignKey('need.id'), nullable=True)
@@ -47,6 +55,7 @@ class Donation(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow) 
 
 class FeaturedSchool(db.Model):
+    """Database model for featured schools on the platform."""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=True)  # Optionally associate with a user
     city = db.Column(db.String(100), nullable=False)
@@ -58,6 +67,7 @@ class FeaturedSchool(db.Model):
     current_funding = db.Column(db.Float, nullable=True) 
 
 class FeaturedSchoolDonation(db.Model):
+    """Database model for donations made to featured schools."""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     school_id = db.Column(db.Integer, db.ForeignKey('featured_school.id'), nullable=False)
@@ -65,6 +75,7 @@ class FeaturedSchoolDonation(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow) 
 
 class MicroDonationPoolJoin(db.Model):
+    """Database model for users who have joined a micro donation pool."""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     pool_id = db.Column(db.Integer, nullable=False)
@@ -72,6 +83,7 @@ class MicroDonationPoolJoin(db.Model):
     joined_at = db.Column(db.DateTime, default=datetime.utcnow) 
 
 class MicroDonationPool(db.Model):
+    """Database model for a pool of micro donations."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)

@@ -288,7 +288,7 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
         </div>
         {/* At the very bottom, add See Impact button */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
-          <a href="/impact" className="btn btn-secondary">See Impact</a>
+          <a href="/impact" className="btn btn-primary">See Impact</a>
         </div>
       </div>
     </div>
