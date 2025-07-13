@@ -156,29 +156,27 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
   return (
     <div className="dashboard">
       <div className="container">
-        <div className="dashboard-header">
-          <h1>Welcome back, {user.name}!</h1>
-          <p>Track your impact and manage your donations</p>
-        </div>
-
-        {/* Impact Overview */}
-        <div className="impact-overview">
-          <div className="impact-card">
-            <h3>Your Impact</h3>
-            <div className="impact-stats">
-              <div className="impact-stat">
-                <div className="stat-number">${totalDonated.toLocaleString()}</div>
-                <div className="stat-label">Total Donated</div>
+        {/* Recent Donations - move to top */}
+        <div style={{ marginBottom: 32 }}>
+          <h2>Recent Donations</h2>
+          <div className="donations-list">
+            {recentDonations.slice(0, 5).map((donation) => (
+              <div key={donation.id} className="donation-item">
+                <div className="donation-info">
+                  <h4>{donation.name}</h4>
+                  <span className="donation-type">
+                    {donation.type === 'School' ? 'School Donation' : 'Pool Donation'}
+                  </span>
+                  <p className="donation-date">{new Date(donation.date).toLocaleDateString()}</p>
+                </div>
+                <div className="donation-amount" style={{ color: 'green', fontWeight: 600, fontSize: '1.2em' }}>
+                  ${donation.amount.toLocaleString()}
+                </div>
               </div>
-              <div className="impact-stat">
-                <div className="stat-number">{donationsMade}</div>
-                <div className="stat-label">Donations Made</div>
-              </div>
-              <div className="impact-stat">
-                <div className="stat-number">{schoolsSupported}</div>
-                <div className="stat-label">Schools Supported</div>
-              </div>
-            </div>
+            ))}
+            {recentDonations.length === 0 && (
+              <p className="no-donations">You haven't made any donations yet. <a href="/schools">Browse schools</a> to get started!</p>
+            )}
           </div>
         </div>
 
@@ -240,30 +238,6 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
           </div>
         </div>
 
-        {/* Recent Donations */}
-        <div className="dashboard-section">
-          <h2>Recent Donations</h2>
-          <div className="donations-list">
-            {recentDonations.slice(0, 5).map((donation) => (
-              <div key={donation.id} className="donation-item">
-                <div className="donation-info">
-                  <h4>{donation.name}</h4>
-                  <span className="donation-type">
-                    {donation.type === 'School' ? 'School Donation' : 'Pool Donation'}
-                  </span>
-                  <p className="donation-date">{new Date(donation.date).toLocaleDateString()}</p>
-                </div>
-                <div className="donation-amount" style={{ color: 'green', fontWeight: 600, fontSize: '1.2em' }}>
-                  ${donation.amount.toLocaleString()}
-                </div>
-              </div>
-            ))}
-            {recentDonations.length === 0 && (
-              <p className="no-donations">You haven't made any donations yet. <a href="/schools">Browse schools</a> to get started!</p>
-            )}
-          </div>
-        </div>
-
         {/* Micro Donation Pools */}
         <div className="dashboard-section">
           <h2>Micro Donation Pools</h2>
@@ -304,28 +278,17 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
                     {joiningPool[pool.id] ? 'Donating...' : 'Donate'}
                   </button>
                 </div>
+                {/* Progress line at the very bottom */}
+                <div style={{ width: '100%', height: 6, background: '#e0e0e0', borderRadius: 3, marginTop: 16 }}>
+                  <div style={{ height: '100%', width: `${(pool.currentAmount / pool.targetAmount) * 100}%`, background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)', borderRadius: 3 }}></div>
+                </div>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="dashboard-section">
-          <h2>Quick Actions</h2>
-          <div className="quick-actions">
-            <a href="/schools" className="action-card">
-              <h3>Browse Schools</h3>
-              <p>Find new schools to support</p>
-            </a>
-            <a href="/schools" className="action-card">
-              <h3>Make a Donation</h3>
-              <p>Support a school in need</p>
-            </a>
-            <a href="#" className="action-card">
-              <h3>View Impact Report</h3>
-              <p>See detailed impact metrics</p>
-            </a>
-          </div>
+        {/* At the very bottom, add See Impact button */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
+          <a href="/impact" className="btn btn-secondary">See Impact</a>
         </div>
       </div>
     </div>

@@ -73,6 +73,7 @@ const Home: React.FC = () => {
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hiddenCompanies, setHiddenCompanies] = useState<string[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -125,28 +126,28 @@ const Home: React.FC = () => {
             <div className="stat-card">
               <div className="stat-icon"><FaDollarSign /></div>
               <div className="stat-number">
-                {typeof stats.totalFunding === 'number' ? `$${stats.totalFunding.toLocaleString()}` : 'N/A'}
+                {`$${(stats.totalFunding ?? fallbackImpactStats.totalFunding).toLocaleString()}`}
               </div>
               <div className="stat-label">Total Funding Raised</div>
             </div>
             <div className="stat-card">
               <div className="stat-icon"><FaSchool /></div>
               <div className="stat-number">
-                {typeof stats.schoolsSupported === 'number' ? stats.schoolsSupported.toLocaleString() : 'N/A'}
+                {(stats.schoolsSupported ?? fallbackImpactStats.schoolsSupported).toLocaleString()}
               </div>
               <div className="stat-label">Schools Supported</div>
             </div>
             <div className="stat-card">
               <div className="stat-icon"><FaUserGraduate /></div>
               <div className="stat-number">
-                {typeof stats.studentsImpacted === 'number' ? stats.studentsImpacted.toLocaleString() : 'N/A'}
+                {(stats.studentsImpacted ?? fallbackImpactStats.studentsImpacted).toLocaleString()}
               </div>
               <div className="stat-label">Students Impacted</div>
             </div>
             <div className="stat-card">
               <div className="stat-icon"><FaHandHoldingHeart /></div>
               <div className="stat-number">
-                {typeof stats.totalDonations === 'number' ? stats.totalDonations.toLocaleString() : 'N/A'}
+                {(stats.totalDonations ?? fallbackImpactStats.totalDonations).toLocaleString()}
               </div>
               <div className="stat-label">Total Donations</div>
             </div>
@@ -158,7 +159,7 @@ const Home: React.FC = () => {
       {/* (Removed: Only show after login) */}
 
       {/* How It Works */}
-      <section className="how-it-works">
+      <section>
         <div className="container">
           <h2>How It Works</h2>
           <div className="steps-grid">
@@ -180,6 +181,49 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Supporting Companies Marquee */}
+      <section style={{ background: '#f7f8fa', padding: '2rem 0', marginTop: 32 }}>
+        <div className="container">
+          <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Companies Supporting Education Funding</h2>
+          <div className="companies-marquee" style={{ overflow: 'hidden', width: '100%' }}>
+            <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 18s linear infinite' }}>
+              {(() => {
+                const companies = [
+                  { name: 'Google', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg' },
+                  { name: 'Microsoft', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg' },
+                  { name: 'Apple', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
+                  { name: 'Amazon', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+                  { name: 'Intel', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Intel-logo.svg' },
+                  { name: 'Salesforce', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Salesforce_logo.svg' },
+                  { name: 'IBM', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg' },
+                ].filter(company => !hiddenCompanies.includes(company.name));
+                // Duplicate the array for seamless looping
+                const loopCompanies = [...companies, ...companies];
+                return loopCompanies.map((company, idx) => (
+                  <span key={company.name + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 18px', minWidth: 60 }}>
+                    <img 
+                      src={company.logo} 
+                      alt={company.name} 
+                      style={{ height: 48, width: 'auto', marginBottom: 0, verticalAlign: 'middle', display: 'block', borderRadius: 10, boxShadow: '0 2px 12px rgba(102,126,234,0.10)', border: '1.5px solid #e0e0e0', background: '#fff', padding: 8 }} 
+                      onError={() => setHiddenCompanies(prev => [...prev, company.name])}
+                    />
+                  </span>
+                ));
+              })()}
+            </div>
+          </div>
+        </div>
+      </section>
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          will-change: transform;
+        }
+      `}</style>
     </div>
   );
 };

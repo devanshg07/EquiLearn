@@ -6,6 +6,7 @@ import DonorDashboard from './pages/DonorDashboard';
 import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Impact from './pages/Impact';
 import { User } from './types';
 import './App.css';
 
@@ -54,6 +55,10 @@ function App() {
                 /> : 
                 <Home />
               } 
+            />
+            <Route 
+              path="/impact"
+              element={<Impact />}
             />
             <Route 
               path="/admin" 
