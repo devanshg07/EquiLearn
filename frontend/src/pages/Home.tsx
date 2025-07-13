@@ -142,29 +142,32 @@ const Home: React.FC = () => {
         </div>
         {/* Removed hero-image */}
       </section>
+      <div className="section-divider" />
 
       {/* Slogan Section */}
       <section style={{ background: '#fff', padding: '1.5rem 0 0.5rem 0', marginBottom: 0 }}>
         <div className="container" style={{ maxWidth: 900, textAlign: 'center' }}>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: '#667eea', marginBottom: 8, letterSpacing: '-1px' }}>
-            Say NO to underfunded education, say YES to EquiLearn
+            Say NO to underfunded education. Say YES to EquiLearn
           </div>
         </div>
       </section>
 
       {/* Impactful Quotes Section */}
-      <section style={{ background: '#fff', padding: '2.5rem 0 1.5rem 0', marginBottom: 0 }}>
+      <section style={{ background: 'linear-gradient(90deg, #e0e7ff 0%, #fff 100%)', padding: '2.5rem 0 1.5rem 0', marginBottom: 0, borderRadius: '0 0 32px 32px' }}>
         <div className="container" style={{ maxWidth: 900, textAlign: 'center', overflow: 'hidden' }}>
           <div className="quotes-marquee" style={{ overflow: 'hidden', width: '100%' }}>
             <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 22s linear infinite', animationDelay: '4s' }}>
               {(() => {
                 const loopQuotes = [...quotes, ...quotes];
                 return loopQuotes.map((q, idx) => (
-                  <span key={q.text + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 48px', minWidth: 320 }}>
-                    <blockquote style={{ fontSize: '1.25rem', fontWeight: 500, color: '#444', fontStyle: 'italic', margin: 0, textAlign: 'center' }}>
+                  <span key={q.text + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 48px', minWidth: 320, fontFamily: '"Times New Roman", Times, serif' }}>
+                    <blockquote style={{ fontSize: '1.25rem', fontWeight: 500, color: '#fff', fontStyle: 'normal', margin: 0, textAlign: 'center' }}>
                       “{q.text}”
                     </blockquote>
-                    <div style={{ marginTop: 12, fontWeight: 600, color: '#667eea', fontSize: '1.05rem' }}>— {q.author}</div>
+                    {q.author !== 'Unknown' && (
+                      <div style={{ marginTop: 12, fontWeight: 600, color: '#fff', fontSize: '1.05rem' }}>— {q.author}</div>
+                    )}
                   </span>
                 ));
               })()}
@@ -174,7 +177,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Impact Stats */}
-      <section className="impact-stats">
+      <section className="impact-stats" style={{ background: 'linear-gradient(120deg, #fff 60%, #e0e7ff 100%)', borderRadius: 24, boxShadow: '0 4px 32px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
           <h2>Our Impact</h2>
           {loading && <div>Loading impact stats...</div>}
@@ -216,9 +219,9 @@ const Home: React.FC = () => {
       {/* (Removed: Only show after login) */}
 
       {/* How It Works */}
-      <section>
+      <section style={{ background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
-          <h2>How It Works</h2>
+          <h2 className="how-it-works-title" style={{ color: '#111', textAlign: 'center' }}>How It Works</h2>
           <div className="steps-grid">
             <div className="step">
               <div className="step-number">1</div>
@@ -240,7 +243,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Supporting Companies Marquee */}
-      <section style={{ background: '#f7f8fa', padding: '2rem 0', marginTop: 32 }}>
+      <section style={{ background: 'linear-gradient(90deg, #e0e7ff 0%, #fff 100%)', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
           <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Companies Supporting Education Funding</h2>
           <div className="companies-marquee" style={{ overflow: 'hidden', width: '100%' }}>
@@ -273,7 +276,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Supporting People Marquee */}
-      <section style={{ background: '#f7f8fa', padding: '2rem 0', marginTop: 0 }}>
+      <section style={{ background: 'linear-gradient(90deg, #e0e7ff 0%, #fff 100%)', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
           <h2 style={{ textAlign: 'center', marginBottom: 24 }}>People Supporting Education Funding</h2>
           <div className="people-marquee" style={{ overflow: 'hidden', width: '100%' }}>

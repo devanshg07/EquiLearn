@@ -7,13 +7,20 @@
 }
 
 body {
+  background: linear-gradient(135deg, #0a2540 0%, #193a5a 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  background: transparent;
-  color: #222;
+  color: #eaf1fa;
   min-height: 100vh;
   line-height: 1.7;
+  /* Subtle animated background */
+  background-attachment: fixed;
+  animation: bgmove 18s linear infinite alternate;
+}
+@keyframes bgmove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 .App {
@@ -36,7 +43,7 @@ main {
 
 /* Navbar */
 .navbar {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: #11151a;
   padding: 1.2rem 0;
   position: sticky;
   top: 0;
@@ -53,12 +60,22 @@ main {
 }
 
 .navbar-logo {
-  color: #fff;
-  text-decoration: none;
+  color: #111;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.3rem 1.2rem;
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 900;
   letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  text-shadow: none;
+  text-decoration: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-logo:hover {
+  background: #2196f3;
+  color: #fff;
 }
 
 .navbar-menu {
@@ -69,11 +86,12 @@ main {
 .navbar-link {
   color: #fff;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 700;
   font-size: 1.1rem;
   padding: 0.5rem 1.2rem;
   border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
+  transition: color 0.2s;
+  text-shadow: none;
 }
 
 .navbar-link:hover {
@@ -175,68 +193,224 @@ main {
 }
 
 /* Card Styles */
-.card {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
+.card, .impact-card, .school-card, .pool-card, .stat-card {
+  background: rgba(18, 32, 47, 0.92);
+  border-radius: 28px;
+  box-shadow: 0 8px 40px rgba(10, 37, 64, 0.18), 0 1.5px 8px rgba(10, 37, 64, 0.10);
   padding: 2rem;
-  margin-bottom: 2rem;
-  transition: box-shadow 0.2s, transform 0.2s;
+  margin: 1rem 0;
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #223a5e;
+  color: #eaf1fa;
 }
-
-.card:hover {
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.18);
-  transform: translateY(-2px) scale(1.01);
+.card:hover, .impact-card:hover, .school-card:hover, .pool-card:hover, .stat-card:hover {
+  box-shadow: 0 16px 56px #2196f3, 0 2px 12px #1565c0;
+  transform: translateY(-6px) scale(1.025);
+  background: rgba(30, 50, 80, 0.98);
 }
 
 /* Button Styles */
-.btn {
-  display: inline-block;
-  padding: 0.85rem 2.2rem;
-  border-radius: 25px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.2s;
+.btn, .btn-primary, .btn-secondary {
+  background: linear-gradient(90deg, #1565c0 0%, #0a2540 100%);
+  color: #fff;
   border: none;
-  cursor: pointer;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.10);
+  border-radius: 32px;
+  padding: 1rem 2.4rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  box-shadow: 0 2px 16px rgba(33, 150, 243, 0.13);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.5px;
+  text-shadow: none;
+}
+.btn:hover, .btn-primary:hover, .btn-secondary:hover {
+  background: linear-gradient(90deg, #0a2540 0%, #1565c0 100%);
+  color: #2196f3;
+  text-shadow: none;
+  transform: scale(1.06);
+  box-shadow: 0 8px 32px rgba(33, 150, 243, 0.18);
 }
 
-.btn:hover {
+/* Section Dividers */
+.section-divider {
+  height: 44px;
+  background: linear-gradient(90deg, #1565c0 0%, #0a2540 100%);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  margin: 0 0 2.5rem 0;
+  box-shadow: 0 2px 12px rgba(33,150,243,0.10);
+}
+
+/* Impactful Stats */
+.impact-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin: 2rem 0 1rem 0;
+}
+.impact-stat {
+  text-align: center;
+}
+.impact-stat .stat-number {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #2196f3;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 2px 12px rgba(21,101,192,0.13);
+}
+.impact-stat .stat-label {
+  color: #eaf1fa;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-shadow: none;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(120deg, #1565c0 0%, #0a2540 100%);
+  color: #fff;
+  padding: 4rem 0 2.7rem 0;
+  border-radius: 0 0 56px 56px;
+  box-shadow: 0 8px 32px rgba(33, 150, 243, 0.10);
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
+  text-shadow: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 60px;
+  background: linear-gradient(180deg, rgba(21,101,192,0.13) 0%, rgba(10,37,64,0) 100%);
+  border-radius: 0 0 56px 56px;
+  z-index: 1;
+}
+.hero-content h1 {
+  font-size: 3.1rem;
+  font-weight: 900;
+  margin-bottom: 1.2rem;
+  letter-spacing: -1px;
+  text-shadow: none;
+}
+.hero-content p {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 2.2rem;
+  text-shadow: none;
+}
+.hero-buttons {
+  display: flex;
+  gap: 1.7rem;
+  justify-content: center;
+}
+
+/* Quotes Marquee */
+.quotes-marquee, .companies-marquee, .people-marquee {
+  background: linear-gradient(90deg, #193a5a 0%, #0a2540 100%);
+  border-radius: 22px;
+  box-shadow: 0 2px 16px rgba(33, 150, 243, 0.10);
+  padding: 1.4rem 0.7rem;
+  margin: 2.2rem 0 1.7rem 0;
+  color: #eaf1fa;
+  text-shadow: none;
+}
+
+/* Marquee Track */
+.marquee-track {
+  will-change: transform;
+}
+
+/* School/Pool Cards */
+.school-card, .pool-card {
+  border-radius: 24px;
+  background: linear-gradient(120deg, #fff 70%, #e0f2ff 100%);
+  box-shadow: 0 2px 16px rgba(33, 150, 243, 0.10);
+  padding: 1.7rem 1.3rem;
+  margin: 1.1rem 0;
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+  border: 1.5px solid #e3f0fc;
+  backdrop-filter: blur(4px);
+}
+.school-card:hover, .pool-card:hover {
+  box-shadow: 0 8px 32px rgba(33, 150, 243, 0.18);
+  transform: translateY(-2px) scale(1.01);
+  background: rgba(255,255,255,0.97);
+}
+
+/* Donations List */
+.donations-list {
   background: #fff;
-  color: #667eea;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
-  border: 1px solid #667eea;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(33, 150, 243, 0.10);
+  padding: 1.3rem 1.1rem;
+  margin-bottom: 2.2rem;
+}
+.donation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0f2ff;
+  padding: 0.8rem 0;
+}
+.donation-item:last-child {
+  border-bottom: none;
 }
 
-.btn-secondary {
+/* Steps Grid */
+.steps-grid {
+  display: flex;
+  gap: 2.7rem;
+  justify-content: center;
+  margin: 2.7rem 0 1.7rem 0;
+}
+.step {
   background: #fff;
-  color: #667eea;
-  border: 1px solid #667eea;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(33, 150, 243, 0.10);
+  padding: 1.7rem 1.3rem;
+  min-width: 230px;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
-
-.btn-secondary:hover {
-  background: #667eea;
+.step-number {
+  background: linear-gradient(90deg, #1565c0 0%, #0a2540 100%);
   color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  border-radius: 50%;
+  width: 2.7rem;
+  height: 2.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.1rem auto;
+  box-shadow: none;
 }
 
-.btn-outline {
-  background: transparent;
-  color: #667eea;
-  border: 1.5px solid #667eea;
+/* Pools Grid */
+.pools-grid {
+  display: flex;
+  gap: 2.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.pool-card {
+  min-width: 330px;
+  max-width: 380px;
 }
 
-.btn-outline:hover {
-  background: #667eea;
-  color: #fff;
+/* Schools Grid */
+.schools-grid {
+  display: flex;
+  gap: 2.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
-
-.btn-small {
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
+.school-card {
+  min-width: 330px;
+  max-width: 380px;
 }
 
 /* Form Styles */
@@ -256,17 +430,20 @@ main {
 .form-group textarea {
   width: 100%;
   padding: 0.9rem 1.2rem;
-  border: 1.5px solid #e0e6f7;
-  border-radius: 10px;
+  border: 1.5px solid #2196f3;
+  border-radius: 8px;
   font-size: 1.1rem;
-  background: #f8f9fa;
+  background: #111a2a;
   transition: border-color 0.2s, box-shadow 0.2s;
+  color: #fff;
+  box-shadow: 0 1px 6px #2196f3;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  outline: none;
+  outline: 2px solid #2196f3;
+  background: #193a5a;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.10);
 }
@@ -288,8 +465,13 @@ main {
 
 /* Responsive design */
 @media (max-width: 900px) {
+  .impact-stats, .steps-grid, .pools-grid, .schools-grid {
+    flex-direction: column;
+    gap: 1.3rem;
+    align-items: center;
+  }
   .container {
-    padding: 0 1rem;
+    padding: 0 0.5rem;
   }
   .navbar-container {
     padding: 0 1rem;
@@ -314,4 +496,73 @@ main {
     padding: 0.7rem 1.2rem;
     font-size: 1rem;
   }
+}
+
+/* Ensure all text and icons are visible and pop */
+* {
+  text-shadow: none;
+}
+
+.stat-card, .impact-stat {
+  color: #7faaff !important;
+}
+.stat-card .stat-number, .impact-stat .stat-number {
+  color: #7faaff !important;
+}
+.stat-card .stat-label, .impact-stat .stat-label {
+  color: #7faaff !important;
+}
+.stat-card .stat-icon, .impact-stat .stat-icon {
+  color: #7faaff !important;
+}
+
+.how-it-works-title, .steps-grid, .step, .step-number, .step h3, .step p {
+  color: #111 !important;
+}
+.how-it-works-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #111 !important;
+}
+.steps-grid {
+  display: flex;
+  gap: 2.5rem;
+  justify-content: center;
+  margin: 2.5rem 0 1.5rem 0;
+}
+.step {
+  background: #1a2636 !important;
+  border-radius: 28px;
+  box-shadow: 0 8px 40px rgba(21, 101, 192, 0.13);
+  padding: 2rem 1.5rem;
+  min-width: 230px;
+  text-align: center;
+  color: #111 !important;
+}
+.step-number {
+  background: linear-gradient(90deg, #7faaff 0%, #1565c0 100%) !important;
+  color: #fff !important;
+  font-size: 1.4rem;
+  font-weight: 800;
+  border-radius: 50%;
+  width: 2.7rem;
+  height: 2.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.1rem auto;
+  box-shadow: 0 2px 12px #7faaff;
+}
+.step h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 1rem 0 0.7rem 0;
+  color: #111 !important;
+}
+.step p {
+  color: #111 !important;
+  font-size: 1.05rem;
+  font-weight: 500;
 }
