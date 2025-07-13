@@ -176,40 +176,40 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Impact Stats */}
-      <section className="impact-stats" style={{ background: 'linear-gradient(120deg, #fff 60%, #e0e7ff 100%)', borderRadius: 24, boxShadow: '0 4px 32px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
+      {/* Impact Stats (refactored to match How It Works) */}
+      <section style={{ background: '#fff', borderRadius: 24, boxShadow: '0 2px 16px rgba(102, 126, 234, 0.10)', margin: '2rem 0', padding: '2.5rem 0' }}>
         <div className="container">
-          <h2>Our Impact</h2>
+          <h2 className="how-it-works-title" style={{ color: '#7faaff', textAlign: 'center' }}>Our Impact</h2>
           {loading && <div>Loading impact stats...</div>}
           {error && <div style={{ color: 'red' }}>{error}</div>}
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon"><FaDollarSign /></div>
-              <div className="stat-number">
+          <div className="steps-grid">
+            <div className="step">
+              <div className="stat-icon" style={{ color: '#7faaff', fontSize: '2.7rem', marginBottom: '1.1rem' }}><FaDollarSign /></div>
+              <div className="stat-number" style={{ color: '#7faaff', fontWeight: 700, fontSize: '2.3rem', marginBottom: '0.5rem', letterSpacing: '-1px' }}>
                 {`$${(stats.totalFunding ?? fallbackImpactStats.totalFunding).toLocaleString()}`}
               </div>
-              <div className="stat-label">Total Funding Raised</div>
+              <div className="stat-label" style={{ color: '#7faaff', fontWeight: 500, fontSize: '1.15rem' }}>Total Funding Raised</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon"><FaSchool /></div>
-              <div className="stat-number">
+            <div className="step">
+              <div className="stat-icon" style={{ color: '#7faaff', fontSize: '2.7rem', marginBottom: '1.1rem' }}><FaSchool /></div>
+              <div className="stat-number" style={{ color: '#7faaff', fontWeight: 700, fontSize: '2.3rem', marginBottom: '0.5rem', letterSpacing: '-1px' }}>
                 {(stats.schoolsSupported ?? fallbackImpactStats.schoolsSupported).toLocaleString()}
               </div>
-              <div className="stat-label">Schools Supported</div>
+              <div className="stat-label" style={{ color: '#7faaff', fontWeight: 500, fontSize: '1.15rem' }}>Schools Supported</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon"><FaUserGraduate /></div>
-              <div className="stat-number">
+            <div className="step">
+              <div className="stat-icon" style={{ color: '#7faaff', fontSize: '2.7rem', marginBottom: '1.1rem' }}><FaUserGraduate /></div>
+              <div className="stat-number" style={{ color: '#7faaff', fontWeight: 700, fontSize: '2.3rem', marginBottom: '0.5rem', letterSpacing: '-1px' }}>
                 {(stats.studentsImpacted ?? fallbackImpactStats.studentsImpacted).toLocaleString()}
               </div>
-              <div className="stat-label">Students Impacted</div>
+              <div className="stat-label" style={{ color: '#7faaff', fontWeight: 500, fontSize: '1.15rem' }}>Students Impacted</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon"><FaHandHoldingHeart /></div>
-              <div className="stat-number">
+            <div className="step">
+              <div className="stat-icon" style={{ color: '#7faaff', fontSize: '2.7rem', marginBottom: '1.1rem' }}><FaHandHoldingHeart /></div>
+              <div className="stat-number" style={{ color: '#7faaff', fontWeight: 700, fontSize: '2.3rem', marginBottom: '0.5rem', letterSpacing: '-1px' }}>
                 {(stats.totalDonations ?? fallbackImpactStats.totalDonations).toLocaleString()}
               </div>
-              <div className="stat-label">Total Donations</div>
+              <div className="stat-label" style={{ color: '#7faaff', fontWeight: 500, fontSize: '1.15rem' }}>Total Donations</div>
             </div>
           </div>
         </div>

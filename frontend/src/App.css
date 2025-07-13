@@ -366,17 +366,17 @@ main {
   margin: 2.7rem 0 1.7rem 0;
 }
 .step {
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 2px 12px rgba(33, 150, 243, 0.10);
-  padding: 1.7rem 1.3rem;
+  background: #223a5e !important;
+  border-radius: 28px;
+  box-shadow: 0 8px 40px rgba(21, 101, 192, 0.13);
+  padding: 2rem 1.5rem;
   min-width: 230px;
   text-align: center;
-  transition: box-shadow 0.2s, transform 0.2s;
+  color: #111 !important;
 }
 .step-number {
-  background: linear-gradient(90deg, #1565c0 0%, #0a2540 100%);
-  color: #fff;
+  background: linear-gradient(90deg, #7faaff 0%, #1565c0 100%) !important;
+  color: #fff !important;
   font-size: 1.4rem;
   font-weight: 800;
   border-radius: 50%;
@@ -386,7 +386,18 @@ main {
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.1rem auto;
-  box-shadow: none;
+  box-shadow: 0 2px 12px #7faaff;
+}
+.step h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 1rem 0 0.7rem 0;
+  color: #111 !important;
+}
+.step p {
+  color: #111 !important;
+  font-size: 1.05rem;
+  font-weight: 500;
 }
 
 /* Pools Grid */
@@ -504,27 +515,27 @@ main {
 }
 
 .stat-card, .impact-stat {
-  color: #7faaff !important;
+  color: #111 !important;
 }
 .stat-card .stat-number, .impact-stat .stat-number {
-  color: #7faaff !important;
+  color: #111 !important;
 }
 .stat-card .stat-label, .impact-stat .stat-label {
-  color: #7faaff !important;
+  color: #111 !important;
 }
 .stat-card .stat-icon, .impact-stat .stat-icon {
-  color: #7faaff !important;
+  color: #111 !important;
 }
 
 .how-it-works-title, .steps-grid, .step, .step-number, .step h3, .step p {
-  color: #111 !important;
+  color: #7faaff !important;
 }
 .how-it-works-title {
   font-size: 2.2rem;
   font-weight: 900;
   text-align: center;
   margin-bottom: 2rem;
-  color: #111 !important;
+  color: #7faaff !important;
 }
 .steps-grid {
   display: flex;
@@ -559,10 +570,10 @@ main {
   font-size: 1.25rem;
   font-weight: 800;
   margin: 1rem 0 0.7rem 0;
-  color: #111 !important;
+  color: #7faaff !important;
 }
 .step p {
-  color: #111 !important;
+  color: #7faaff !important;
   font-size: 1.05rem;
   font-weight: 500;
 }

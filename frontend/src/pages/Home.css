@@ -62,7 +62,7 @@ body, .home {
   text-align: center;
   font-size: 2.5rem;
   margin-bottom: 2.5rem;
-  color: #222;
+  color: #7faaff;
   font-weight: 800;
   letter-spacing: -1px;
 }
@@ -85,11 +85,10 @@ body, .home {
 }
 
 .stat-card {
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(8px);
-  border-radius: 22px;
+  background: #19253a;
+  border-radius: 20px;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.13);
+  box-shadow: 0 2px 12px rgba(102, 126, 234, 0.07);
   transition: box-shadow 0.2s, transform 0.2s;
   display: flex !important;
   flex-direction: column !important;
@@ -103,20 +102,29 @@ body, .home {
   min-width: 210px !important;
   position: relative;
   animation: fadeIn 1.2s;
+  padding: 2rem 1rem;
+  backdrop-filter: none;
+  border: none;
 }
 
 .stat-card:hover {
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.18);
-  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 6px 24px rgba(102, 126, 234, 0.13);
+  transform: translateY(-2px) scale(1.01);
+  background: #1a2942;
+}
+
+.stat-card, .stat-card *, .stat-card strong, .stat-card span, .stat-card div, .stat-card p, .stat-card h3 {
+  color: #7faaff !important;
+  font-family: inherit !important;
+  font-weight: 500 !important;
 }
 
 .stat-icon {
   font-size: 2.7rem;
-  color: #667eea;
   margin-bottom: 1.1rem;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,16 +132,14 @@ body, .home {
 
 .stat-number {
   font-size: 2.3rem;
-  font-weight: 800;
-  color: #667eea;
   margin-bottom: 0.5rem;
   letter-spacing: -1px;
+  font-weight: 700 !important;
 }
 
 .stat-label {
-  color: #666;
   font-size: 1.15rem;
-  font-weight: 500;
+  font-weight: 500 !important;
 }
 
 .featured-schools {
