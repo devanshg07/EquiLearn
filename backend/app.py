@@ -302,7 +302,7 @@ def get_impact_stats():
 @app.route('/api/featured-schools')
 def featured_schools():
     city = request.args.get('city')
-    user_id = request.args.get('user_id')  # Optionally associate with user
+    user_id = request.args.get('user_id')
     if not city:
         return jsonify({'error': 'City is required'}), 400
     # Check DB first for this city only
@@ -311,7 +311,6 @@ def featured_schools():
         query = query.filter_by(user_id=user_id)
     schools = query.all()
     if schools:
-        # Return cached schools for this city
         return jsonify([
             {
                 'id': s.id,
@@ -323,45 +322,99 @@ def featured_schools():
                 'currentFunding': s.current_funding
             } for s in schools
         ])
-    # If not found, call OpenAI with improved prompt
-    prompt = (
-        f"List 3 real K-12 schools in {city}, Canada, with a short description, a list of needs as an array of strings (not objects), a fundingGoal (a realistic total fundraising goal in USD), and currentFunding (a plausible amount already raised, less than fundingGoal). "
-        f"Format as JSON: [{{'name':..., 'location':..., 'description':..., 'needs': [string, ...], 'fundingGoal': ..., 'currentFunding': ...}}]"
-    )
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=400
-        )
-        import re
-        match = re.search(r'\[.*\]', response['choices'][0]['message']['content'], re.DOTALL)
-        if match:
-            schools_data = json.loads(match.group(0))
-        else:
-            schools_data = []
-        # Ensure each school has unique, reasonable funding values
-        for s in schools_data:
-            if not s.get('fundingGoal') or not isinstance(s['fundingGoal'], (int, float)):
-                s['fundingGoal'] = random.randint(5000, 20000)
-            if not s.get('currentFunding') or not isinstance(s['currentFunding'], (int, float)) or s['currentFunding'] >= s['fundingGoal']:
-                s['currentFunding'] = random.randint(0, int(s['fundingGoal'] * 0.7))
-        # Save to DB for this city
-        for s in schools_data:
-            db.session.add(FeaturedSchool(
-                user_id=user_id,
-                city=city,
-                name=s.get('name',''),
-                location=s.get('location',''),
-                description=s.get('description',''),
-                needs=json.dumps(s.get('needs', [])),
-                funding_goal=s.get('fundingGoal'),
-                current_funding=s.get('currentFunding')
-            ))
-        db.session.commit()
-        return jsonify(schools_data)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    # Instead of OpenAI, generate 6 mock schools with reasonable values
+    if city and city.lower() == 'mississauga':
+        mock_schools = [
+            {
+                'name': 'John Fraser Secondary School',
+                'location': '2665 Erin Centre Blvd, Mississauga, ON L5M 5H6',
+                'description': 'John Fraser Secondary School is a public high school in Mississauga with a focus on academic excellence and extracurricular activities.',
+                'needs': ['new textbooks', 'upgraded technology', 'sports equipment'],
+                'fundingGoal': 10000,
+                'currentFunding': 300
+            },
+            {
+                'name': 'St. Marcellinus Secondary School',
+                'location': '730 Courtneypark Dr W, Mississauga, ON L5W 1L9',
+                'description': 'St. Marcellinus Secondary School is a Catholic high school known for its strong arts and sports programs.',
+                'needs': ['musical instruments', 'art supplies', 'sports uniforms'],
+                'fundingGoal': 8000,
+                'currentFunding': 210
+            },
+            {
+                'name': 'Barondale Public School',
+                'location': '200 Barondale Dr, Mississauga, ON L4Z 3N7',
+                'description': 'Barondale Public School is an elementary school in Mississauga that prides itself on fostering a supportive and inclusive learning environment.',
+                'needs': ['educational games', 'classroom supplies', 'updated library books'],
+                'fundingGoal': 5000,
+                'currentFunding': 0
+            },
+        ]
+        return jsonify(mock_schools)
+    mock_schools = [
+        {
+            'name': f'{city} Central School',
+            'location': f'{city}, Main St',
+            'description': f'A leading K-12 school in {city}.',
+            'needs': ['new computers', 'library books', 'sports equipment'],
+            'fundingGoal': 10000,
+            'currentFunding': 3000
+        },
+        {
+            'name': f'{city} North Academy',
+            'location': f'{city}, North Ave',
+            'description': f'An innovative school in the north of {city}.',
+            'needs': ['science lab', 'musical instruments', 'art supplies'],
+            'fundingGoal': 5000,
+            'currentFunding': 2100
+        },
+        {
+            'name': f'{city} South Elementary',
+            'location': f'{city}, South Rd',
+            'description': f'A vibrant elementary school in {city}.',
+            'needs': ['playground upgrade', 'STEM kits', 'tablets'],
+            'fundingGoal': 6400,
+            'currentFunding': 1200
+        },
+        {
+            'name': f'{city} West High',
+            'location': f'{city}, West Blvd',
+            'description': f'A high school with a focus on sports and arts.',
+            'needs': ['gym renovation', 'band uniforms', 'projectors'],
+            'fundingGoal': 15000,
+            'currentFunding': 8000
+        },
+        {
+            'name': f'{city} East Prep',
+            'location': f'{city}, East Pkwy',
+            'description': f'A preparatory school in the east of {city}.',
+            'needs': ['robotics club', 'language lab', 'smart boards'],
+            'fundingGoal': 12000,
+            'currentFunding': 4000
+        },
+        {
+            'name': f'{city} Lakeside School',
+            'location': f'{city}, Lakeside Dr',
+            'description': f'A school near the lake in {city}.',
+            'needs': ['canoes', 'environmental science kits', 'garden tools'],
+            'fundingGoal': 9000,
+            'currentFunding': 6000
+        },
+    ]
+    # Save to DB for this city
+    for s in mock_schools:
+        db.session.add(FeaturedSchool(
+            user_id=user_id,
+            city=city,
+            name=s['name'],
+            location=s['location'],
+            description=s['description'],
+            needs=json.dumps(s['needs']),
+            funding_goal=s['fundingGoal'],
+            current_funding=s['currentFunding']
+        ))
+    db.session.commit()
+    return jsonify(mock_schools)
 
 @app.route('/api/featured-schools/donate', methods=['POST'])
 def donate_to_featured_school():

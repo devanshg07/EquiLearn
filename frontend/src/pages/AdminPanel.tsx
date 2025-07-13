@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { mockSchools, mockDonations, mockImpactStats } from '../data/mockData';
+import { mockDonations, mockImpactStats } from '../data/mockData';
+import { useEffect } from 'react';
 import './AdminPanel.css';
 
 const AdminPanel: React.FC = () => {
@@ -7,6 +8,14 @@ const AdminPanel: React.FC = () => {
 
   const totalDonations = mockDonations.reduce((sum, d) => sum + d.amount, 0);
   const averageDonation = totalDonations / mockDonations.length;
+
+  // State for real schools
+  const [schools, setSchools] = useState<any[]>([]);
+  useEffect(() => {
+    fetch('/api/schools')
+      .then(res => res.json())
+      .then(data => setSchools(data));
+  }, []);
 
   return (
     <div className="admin-panel">
@@ -105,21 +114,41 @@ const AdminPanel: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockSchools.map((school) => (
+                  {schools.map((school: any) => (
                     <tr key={school.id}>
                       <td>{school.name}</td>
-                      <td>{school.location}</td>
-                      <td>{school.category}</td>
-                      <td>${school.fundingGoal.toLocaleString()}</td>
-                      <td>${school.currentFunding.toLocaleString()}</td>
+                      <td>{school.location}, {school.city}, {school.state}</td>
+                      <td>-</td>
+                      <td>
+                        ${school.needs && school.needs.length > 0
+                          ? school.needs.reduce((sum: number, n: any) => sum + (n.totalCost || 0), 0).toLocaleString()
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        ${school.needs && school.needs.length > 0
+                          ? school.needs.reduce((sum: number, n: any) => sum + ((n.currentDonations || 0) * (n.costPerItem || 0)), 0).toLocaleString()
+                          : 'N/A'}
+                      </td>
                       <td>
                         <div className="progress-bar">
                           <div 
                             className="progress-fill" 
-                            style={{ width: `${(school.currentFunding / school.fundingGoal) * 100}%` }}
+                            style={{ width: `${school.needs && school.needs.length > 0
+                              ? Math.round(
+                                  (school.needs.reduce((sum: number, n: any) => sum + ((n.currentDonations || 0) * (n.costPerItem || 0)), 0) /
+                                   school.needs.reduce((sum: number, n: any) => sum + (n.totalCost || 0), 0)
+                                  ) * 100
+                                )
+                              : 0}%` }}
                           ></div>
                         </div>
-                        <span>{Math.round((school.currentFunding / school.fundingGoal) * 100)}%</span>
+                        <span>{school.needs && school.needs.length > 0
+                          ? Math.round(
+                              (school.needs.reduce((sum: number, n: any) => sum + ((n.currentDonations || 0) * (n.costPerItem || 0)), 0) /
+                               school.needs.reduce((sum: number, n: any) => sum + (n.totalCost || 0), 0)
+                              ) * 100
+                            )
+                          : 0}%</span>
                       </td>
                       <td>
                         <button className="btn btn-small">Edit</button>
