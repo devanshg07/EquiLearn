@@ -68,12 +68,32 @@ function FundingCircle({ percent }: { percent: number }) {
   );
 }
 
+const quotes = [
+  {
+    text: 'Education is the most powerful weapon which you can use to change the world.',
+    author: 'Nelson Mandela',
+  },
+  {
+    text: 'An investment in knowledge pays the best interest.',
+    author: 'Benjamin Franklin',
+  },
+  {
+    text: 'The cost of ignorance is far greater than the price of education.',
+    author: 'Unknown',
+  },
+  {
+    text: 'Underfunded schools are a threat to our future. Every child deserves a chance.',
+    author: 'Malala Yousafzai',
+  },
+];
+
 const Home: React.FC = () => {
   const [impactStats, setImpactStats] = useState<ImpactStats | null>(null);
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hiddenCompanies, setHiddenCompanies] = useState<string[]>([]);
+  const [quoteIdx, setQuoteIdx] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -98,6 +118,13 @@ const Home: React.FC = () => {
       });
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setQuoteIdx(idx => (idx + 1) % quotes.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
   const featuredSchools = schools.slice(0, 3);
   const stats = impactStats || fallbackImpactStats;
 
@@ -109,11 +136,41 @@ const Home: React.FC = () => {
           <h1>Connecting Schools with Donors</h1>
           <p>Empowering education through community support. Help schools get the resources they need to provide quality education for all students.</p>
           <div className="hero-buttons">
-            <Link to="/schools" className="btn btn-primary">Browse Schools</Link>
+            {/* Remove Browse Schools button */}
             <Link to="/register" className="btn btn-secondary">Become a Donor</Link>
           </div>
         </div>
         {/* Removed hero-image */}
+      </section>
+
+      {/* Slogan Section */}
+      <section style={{ background: '#fff', padding: '1.5rem 0 0.5rem 0', marginBottom: 0 }}>
+        <div className="container" style={{ maxWidth: 900, textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', fontWeight: 700, color: '#667eea', marginBottom: 8, letterSpacing: '-1px' }}>
+            Say NO to underfunded education, say YES to EquiLearn
+          </div>
+        </div>
+      </section>
+
+      {/* Impactful Quotes Section */}
+      <section style={{ background: '#fff', padding: '2.5rem 0 1.5rem 0', marginBottom: 0 }}>
+        <div className="container" style={{ maxWidth: 900, textAlign: 'center', overflow: 'hidden' }}>
+          <div className="quotes-marquee" style={{ overflow: 'hidden', width: '100%' }}>
+            <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 22s linear infinite', animationDelay: '4s' }}>
+              {(() => {
+                const loopQuotes = [...quotes, ...quotes];
+                return loopQuotes.map((q, idx) => (
+                  <span key={q.text + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 48px', minWidth: 320 }}>
+                    <blockquote style={{ fontSize: '1.25rem', fontWeight: 500, color: '#444', fontStyle: 'italic', margin: 0, textAlign: 'center' }}>
+                      “{q.text}”
+                    </blockquote>
+                    <div style={{ marginTop: 12, fontWeight: 600, color: '#667eea', fontSize: '1.05rem' }}>— {q.author}</div>
+                  </span>
+                ));
+              })()}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Impact Stats */}
@@ -187,7 +244,7 @@ const Home: React.FC = () => {
         <div className="container">
           <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Companies Supporting Education Funding</h2>
           <div className="companies-marquee" style={{ overflow: 'hidden', width: '100%' }}>
-            <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 18s linear infinite' }}>
+            <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 18s linear infinite', animationDelay: '4s' }}>
               {(() => {
                 const companies = [
                   { name: 'Google', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg' },
@@ -198,16 +255,41 @@ const Home: React.FC = () => {
                   { name: 'Salesforce', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Salesforce_logo.svg' },
                   { name: 'IBM', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg' },
                 ].filter(company => !hiddenCompanies.includes(company.name));
-                // Duplicate the array for seamless looping
                 const loopCompanies = [...companies, ...companies];
                 return loopCompanies.map((company, idx) => (
-                  <span key={company.name + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 18px', minWidth: 60 }}>
+                  <span key={company.name + idx} style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '0 32px', minWidth: 60 }}>
                     <img 
                       src={company.logo} 
                       alt={company.name} 
                       style={{ height: 48, width: 'auto', marginBottom: 0, verticalAlign: 'middle', display: 'block', borderRadius: 10, boxShadow: '0 2px 12px rgba(102,126,234,0.10)', border: '1.5px solid #e0e0e0', background: '#fff', padding: 8 }} 
                       onError={() => setHiddenCompanies(prev => [...prev, company.name])}
                     />
+                  </span>
+                ));
+              })()}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Supporting People Marquee */}
+      <section style={{ background: '#f7f8fa', padding: '2rem 0', marginTop: 0 }}>
+        <div className="container">
+          <h2 style={{ textAlign: 'center', marginBottom: 24 }}>People Supporting Education Funding</h2>
+          <div className="people-marquee" style={{ overflow: 'hidden', width: '100%' }}>
+            <div className="marquee-track" style={{ display: 'flex', width: 'max-content', animation: 'marquee 18s linear infinite', animationDelay: '4s' }}>
+              {(() => {
+                const people = [
+                  'Bill Gates',
+                  'MacKenzie Scott',
+                  'Mark Zuckerberg',
+                  'Elon Musk',
+                  'Michael Bloomberg',
+                ];
+                const loopPeople = [...people, ...people];
+                return loopPeople.map((person, idx) => (
+                  <span key={person + idx} style={{ display: 'inline-flex', alignItems: 'center', margin: '0 32px', fontWeight: 600, fontSize: 22, color: '#333' }}>
+                    {person}
                   </span>
                 ));
               })()}

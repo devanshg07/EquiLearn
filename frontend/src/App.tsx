@@ -12,6 +12,14 @@ import './App.css';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [recentDonations, setRecentDonations] = useState<any[]>(() => {
+    const stored = localStorage.getItem('recentDonations');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('recentDonations', JSON.stringify(recentDonations));
+  }, [recentDonations]);
 
   // Restore user from localStorage on app load
   useEffect(() => {
@@ -52,13 +60,15 @@ function App() {
                       return updated;
                     });
                   }}
+                  recentDonations={recentDonations}
+                  setRecentDonations={setRecentDonations}
                 /> : 
                 <Home />
               } 
             />
             <Route 
               path="/impact"
-              element={<Impact />}
+              element={<Impact recentDonations={recentDonations} />}
             />
             <Route 
               path="/admin" 

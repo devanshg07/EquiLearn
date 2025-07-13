@@ -1,14 +1,10 @@
 import React from 'react';
 
-// For now, use mock data for recentDonations
-const mockRecentDonations = [
-  { id: 1, name: 'John Fraser Secondary School', type: 'School', amount: 100, date: new Date().toISOString() },
-  { id: 2, name: 'Pool A', type: 'Pool', amount: 50, date: new Date().toISOString() },
-  { id: 3, name: 'St. Marcellinus Secondary School', type: 'School', amount: 75, date: new Date().toISOString() },
-];
+interface ImpactProps {
+  recentDonations: any[];
+}
 
-const Impact: React.FC = () => {
-  const recentDonations = mockRecentDonations; // Replace with prop or context if needed
+const Impact: React.FC<ImpactProps> = ({ recentDonations }) => {
   const totalDonated = recentDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
   const donationsMade = recentDonations.length;
   const schoolsSupported = new Set(recentDonations.filter(d => d.type === 'School').map(d => d.name)).size;

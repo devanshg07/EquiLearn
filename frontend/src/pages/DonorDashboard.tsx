@@ -6,9 +6,11 @@ import './Dashboard.css';
 interface DonorDashboardProps {
   user: User;
   onUserTotalDonatedChange?: (total: number) => void;
+  recentDonations: any[];
+  setRecentDonations: (fn: (prev: any[]) => any[]) => void;
 }
 
-const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonatedChange }) => {
+const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonatedChange, recentDonations, setRecentDonations }) => {
   // Remove mockDonations usage for impact
   const [userDonations, setUserDonations] = useState<any[]>([]);
   const [donationsLoading, setDonationsLoading] = useState(false);
@@ -56,8 +58,6 @@ const DonorDashboard: React.FC<DonorDashboardProps> = ({ user, onUserTotalDonate
       currentFunding: 0
     }
   ]);
-
-  const [recentDonations, setRecentDonations] = useState<any[]>([]);
 
   const handleMockSchoolDonate = (schoolId: number, amount: number) => {
     setMockSchools(schools =>
